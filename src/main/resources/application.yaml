@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: PromptCraft
+    description: AI-powered app builder application inspired by Lovable.dev
+  datasource:
+    url: jdbc:postgresql://localhost:5434/promptcraft
+    username: promptcraft
+    password: promptcraft123
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
