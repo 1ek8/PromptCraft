@@ -1,7 +1,6 @@
 package com.promptcraft.promptcraft.entity;
 
 
-import com.promptcraft.promptcraft.enums.SubscriptionStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,30 +13,24 @@ import java.time.Instant;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Subscription {
+public class Project {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long Id;
 
-    @ManyToOne
-    User user;
+    @Column(nullable = false)
+    String name;
 
     @ManyToOne
-    Plan plan;
+    User owner;
 
-    SubscriptionStatus status;
-
-    String stripeCustomerId;
-
-    String stripeSubscriptionId;
-
-    Instant currentPeriodStart;
-
-    Instant currentPeriodEnd;
+    Boolean isPublic = false;
 
     Instant createdAt;
 
     Instant updatedAt;
+
+    Instant deletedAt;
 
 }
