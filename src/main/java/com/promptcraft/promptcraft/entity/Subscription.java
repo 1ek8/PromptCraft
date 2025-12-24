@@ -1,5 +1,6 @@
 package com.promptcraft.promptcraft.entity;
 
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,26 +10,31 @@ import lombok.experimental.FieldDefaults;
 import java.time.Instant;
 
 @Entity
-@Setter
 @Getter
+@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class User   {
+public class Subscription {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long Id;
 
-    @Column(nullable = false, unique = true)
-    String username;
+    @ManyToOne
+    User user;
 
-    @Column(nullable = false)
-    String passwordHash;
+    @ManyToOne
+    Plan plan;
 
-    String avatarUrl;
+    String stripeCustomerId;
+
+    String stripeSubscriptionId;
+
+    Instant currentPeriodStart;
+
+    Instant currentPeriodEnd;
 
     Instant createdAt;
 
     Instant updatedAt;
 
-    Instant deletedAt;
 }
