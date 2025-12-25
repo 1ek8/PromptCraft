@@ -1,4 +1,4 @@
 package com.promptcraft.promptcraft.entity;
 
-public class ProjectMemberId {
+public class ProjectParticipantId {
 }

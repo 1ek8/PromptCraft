@@ -13,10 +13,10 @@ import java.time.Instant;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProjectMember {
+public class ProjectParticipant {
 
     @Id
-    ProjectMemberId Id;
+    ProjectParticipantId Id;
 
     @ManyToOne
     Project project;
