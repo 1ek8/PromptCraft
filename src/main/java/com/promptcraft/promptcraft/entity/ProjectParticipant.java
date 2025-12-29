@@ -1,6 +1,6 @@
 package com.promptcraft.promptcraft.entity;
 
-import com.promptcraft.promptcraft.enums.ProjectRole;
+import com.promptcraft.promptcraft.entity.enums.ProjectRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import java.time.Instant;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProjectParticipant {
 
-    @Id
+    @EmbeddedId
     ProjectParticipantId Id;
 
     @ManyToOne

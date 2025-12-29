@@ -1,6 +1,6 @@
 package com.promptcraft.promptcraft.dto.participant;
 
-import com.promptcraft.promptcraft.enums.ProjectRole;
+import com.promptcraft.promptcraft.entity.enums.ProjectRole;
 
 import java.time.Instant;
 

@@ -5,6 +5,7 @@ import com.promptcraft.promptcraft.dto.project.ProjectResponse;
 import com.promptcraft.promptcraft.dto.project.ProjectSummaryResponse;
 import com.promptcraft.promptcraft.entity.Project;
 import com.promptcraft.promptcraft.entity.User;
+import com.promptcraft.promptcraft.mapper.ProjectMapper;
 import com.promptcraft.promptcraft.repository.ProjectRepository;
 import com.promptcraft.promptcraft.repository.UserRepository;
 import com.promptcraft.promptcraft.service.ProjectService;
@@ -12,16 +13,19 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Transactional
 public class ProjectServiceImpl implements ProjectService {
 
     ProjectRepository projectRepository;
-    private final UserRepository userRepository;
+    UserRepository userRepository;
+    ProjectMapper projectMapper;
 
 
     @Override
@@ -45,7 +49,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         project = projectRepository.save(project);
 
-        return new ProjectResponse(project.getId(), project.getName(), project.getCreatedAt(), project.getUpdatedAt(), project.getOwner());
+        return projectMapper.toProjectResponse(project);
     }
 
     @Override

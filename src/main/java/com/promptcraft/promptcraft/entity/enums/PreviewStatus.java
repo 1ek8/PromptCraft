@@ -1,4 +1,4 @@
-package com.promptcraft.promptcraft.enums;
+package com.promptcraft.promptcraft.entity.enums;
 
 public enum PreviewStatus {
 

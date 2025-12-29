@@ -1,6 +1,6 @@
 package com.promptcraft.promptcraft.entity;
 
-import com.promptcraft.promptcraft.enums.MessageRole;
+import com.promptcraft.promptcraft.entity.enums.MessageRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

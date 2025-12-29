@@ -1,7 +1,7 @@
 package com.promptcraft.promptcraft.entity;
 
 
-import com.promptcraft.promptcraft.enums.SubscriptionStatus;
+import com.promptcraft.promptcraft.entity.enums.SubscriptionStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
