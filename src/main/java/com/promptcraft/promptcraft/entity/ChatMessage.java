@@ -1,5 +1,6 @@
 package com.promptcraft.promptcraft.entity;
 
+import com.promptcraft.promptcraft.enums.MessageRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,8 +15,10 @@ import java.time.Instant;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChatMessage {
 
+    @Id
     Long Id;
 
+    @ManyToOne
     ChatSession chatSession;
 
     String content;

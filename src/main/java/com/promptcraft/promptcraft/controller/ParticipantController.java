@@ -44,7 +44,7 @@ public class ParticipantController {
     }
 
     @DeleteMapping("/{participantId")
-    public ResponseEntity<ParticipantResponse> updatePartipcpantRole(
+    public ResponseEntity<ParticipantResponse> deleteParticipant(
             @PathVariable Long projectId,
             @PathVariable Long particpantId
     ){

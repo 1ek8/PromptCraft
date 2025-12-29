@@ -6,6 +6,7 @@ spring:
     url: jdbc:postgresql://localhost:5434/promptcraft
     username: promptcraft
     password: promptcraft123
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: create
@@ -13,3 +14,4 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect

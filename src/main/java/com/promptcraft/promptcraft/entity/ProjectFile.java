@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Getter
@@ -33,5 +34,5 @@ public class ProjectFile {
     User createdBy;
 
     @OneToMany
-    User updatedBy;
+    List<User> updatedBy;
 }

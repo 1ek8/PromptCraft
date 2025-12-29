@@ -1,10 +1,10 @@
 package com.promptcraft.promptcraft.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 
@@ -12,6 +12,9 @@ import java.time.Instant;
 @Setter
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class User   {
 
     @Id
@@ -26,8 +29,10 @@ public class User   {
 
     String avatarUrl;
 
+    @CreationTimestamp
     Instant createdAt;
 
+    @UpdateTimestamp
     Instant updatedAt;
 
     Instant deletedAt;

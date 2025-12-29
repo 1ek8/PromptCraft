@@ -14,10 +14,15 @@ import java.time.Instant;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UsageLog {
 
+    @Id
     Long Id;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     User user;
 
+    @ManyToOne
+    @JoinColumn(name = "project_id")
     Project project;
 
     String action;
