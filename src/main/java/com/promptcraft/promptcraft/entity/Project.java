@@ -16,7 +16,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
+@Table(name = "project_table")
 public class Project {
 
     @Id

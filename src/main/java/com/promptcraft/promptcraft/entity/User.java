@@ -15,6 +15,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(name = "user_table")
 public class User   {
 
     @Id
