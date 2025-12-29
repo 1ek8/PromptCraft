@@ -3,6 +3,7 @@ package com.promptcraft.promptcraft.service.impl;
 import com.promptcraft.promptcraft.dto.project.ProjectRequest;
 import com.promptcraft.promptcraft.dto.project.ProjectResponse;
 import com.promptcraft.promptcraft.dto.project.ProjectSummaryResponse;
+import com.promptcraft.promptcraft.entity.Project;
 import com.promptcraft.promptcraft.entity.User;
 import com.promptcraft.promptcraft.repository.ProjectRepository;
 import com.promptcraft.promptcraft.repository.UserRepository;
@@ -36,7 +37,15 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectResponse createProject(ProjectRequest request, Long userId) {
         User owner = userRepository.findById(userId).orElseThrow();
-        return null;
+
+        Project project = Project.builder()
+                .name(request.name())
+                .owner(owner)
+                .build();
+
+        project = projectRepository.save(project);
+
+        return new ProjectResponse(project.getId(), project.getName(), project.getCreatedAt(), project.getUpdatedAt(), project.getOwner());
     }
 
     @Override
