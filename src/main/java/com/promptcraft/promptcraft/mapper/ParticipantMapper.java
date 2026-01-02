@@ -9,10 +9,13 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ParticipantMapper {
 
-    @Mapping(target = "userId", source = "Id")
+    @Mapping(target = "userId", source = "id")
     @Mapping(target = "role", constant = "OWNER")
     ParticipantResponse toParticipantResponseFromOwner(User owner);
 
+    @Mapping(target = "userId", source = "user.id") //nested mapping
+    @Mapping(target = "email", source = "user.email")
+    @Mapping(target = "name", source = "user.name")
     ParticipantResponse toParticipantResponseFromParticipant(ProjectParticipant projectParticipant);
 
 }

@@ -1,19 +1,16 @@
 package com.promptcraft.promptcraft.service.impl;
 
+import com.promptcraft.promptcraft.dto.auth.UserProfileResponse;
 import com.promptcraft.promptcraft.dto.subscription.PlanLimitsResponse;
 import com.promptcraft.promptcraft.dto.subscription.UsageTodayResponse;
 import com.promptcraft.promptcraft.service.UsageService;
+import com.promptcraft.promptcraft.service.UserService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl implements UsageService {
+public class UserServiceImpl implements UserService {
     @Override
-    public UsageTodayResponse getTodayUsage(Long userId) {
-        return null;
-    }
-
-    @Override
-    public PlanLimitsResponse getCurrentLimit(Long userId) {
+    public UserProfileResponse getProfile(Long userId) {
         return null;
     }
 }

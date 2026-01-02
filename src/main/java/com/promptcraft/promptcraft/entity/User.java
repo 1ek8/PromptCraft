@@ -20,10 +20,13 @@ public class User   {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long Id;
+    Long id;
 
     @Column(nullable = false, unique = true)
-    String username;
+    String email;
+
+    @Column(nullable = false)
+    String name;
 
     @Column(nullable = false)
     String passwordHash;

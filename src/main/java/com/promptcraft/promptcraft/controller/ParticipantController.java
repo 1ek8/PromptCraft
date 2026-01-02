@@ -24,7 +24,7 @@ public class ParticipantController {
     }
 
     @PostMapping
-    public ResponseEntity<List<ParticipantResponse>> inviteMember(
+    public ResponseEntity<ParticipantResponse> inviteMember(
             @PathVariable Long projectId,
             @RequestBody InviteParticipantRequest request
             ){
@@ -32,7 +32,7 @@ public class ParticipantController {
         return ResponseEntity.status(HttpStatus.CREATED).body(participantService.inviteParticipant(projectId, request, userId));
     }
 
-    @PatchMapping("/{participantId")
+    @PatchMapping("/{participantId}")
     public ResponseEntity<ParticipantResponse> updatePartipcpantRole(
             @PathVariable Long projectId,
             @PathVariable Long particpantId,
@@ -42,7 +42,7 @@ public class ParticipantController {
         return ResponseEntity.ok(participantService.updateParticipantRole(projectId, particpantId, request, userId));
     }
 
-    @DeleteMapping("/{participantId")
+    @DeleteMapping("/{participantId}")
     public ResponseEntity<ParticipantResponse> deleteParticipant(
             @PathVariable Long projectId,
             @PathVariable Long particpantId
