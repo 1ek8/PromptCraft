@@ -5,7 +5,7 @@ import com.promptcraft.promptcraft.entity.enums.ProjectRole;
 import java.time.Instant;
 
 public record ParticipantResponse(
-        Long Id,
+        Long userId,
         String email,
         String name,
         String avatarUrl,

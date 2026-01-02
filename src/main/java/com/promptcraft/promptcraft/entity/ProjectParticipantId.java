@@ -1,10 +1,15 @@
 package com.promptcraft.promptcraft.entity;
 
 import jakarta.persistence.Embeddable;
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Embeddable
-@Data
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProjectParticipantId {
 
     Long projectId;
