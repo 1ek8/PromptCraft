@@ -3,15 +3,26 @@ package com.promptcraft.promptcraft.service.impl;
 import com.promptcraft.promptcraft.dto.participant.InviteParticipantRequest;
 import com.promptcraft.promptcraft.dto.participant.ParticipantResponse;
 import com.promptcraft.promptcraft.dto.participant.UpdateParticipantRole;
+import com.promptcraft.promptcraft.repository.ParticipantRepository;
 import com.promptcraft.promptcraft.service.ParticipantService;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class ParticipantServiceImpl implements ParticipantService {
+
+    ParticipantRepository participantRepository;
+
     @Override
     public List<ParticipantResponse> getAllMembers(Long projectId, Long userId) {
+
+
         return List.of();
     }
 

@@ -15,7 +15,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,13 +31,20 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
+    //this method shouldnt just fetch the list of projects taht the user owns but also the projects where the user is a participant
     public List<ProjectSummaryResponse> getUserProjects(Long userId) {
-        return List.of();
+//        return projectRepository.findAllProjectsAccessibleByUser(userId)
+//                .stream()
+//                .map(project -> projectMapper.toProjectSummaryResponse(project))
+//                .collect(Collectors.toList());
+
+        return projectMapper.toListOfProjectSummaryRepsonse(projectRepository.findAllProjectsAccessibleByUser(userId));
     }
 
     @Override
-    public ProjectResponse getProjectById(Long id, Long userId) {
-        return null;
+    public ProjectResponse getProjectById(Long projectId, Long userId) {
+        Project project = projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow();
+        return projectMapper.toProjectResponse(project);
     }
 
     @Override
@@ -54,11 +63,25 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectResponse updateProject(Long id, ProjectRequest request, Long userId) {
-        return null;
+        Project project = projectRepository.findAccessibleProjectById(id, userId).orElseThrow();
+
+        project.setName(request.name());
+        project = projectRepository.save(project);
+        // the project variable returned here will have the updatedAt value set to previous value, not latest one, because this entire function logic is @Transactional. when I set the name of the project the Timestamp is not being updated, it gets updated only when the DB write operation persists updated data.
+
+        return projectMapper.toProjectResponse(project);
     }
 
     @Override
     public void softDelete(Long id, Long userId) {
+        Project project = projectRepository.findAccessibleProjectById(id, userId).orElseThrow();
+
+        if(!project.getOwner().getId().equals(userId)) {
+            throw new RuntimeException("Only a project's owner can delete a probject");
+        }
+
+        project.setDeletedAt(Instant.now());
+        projectRepository.save(project);
 
     }
 }
