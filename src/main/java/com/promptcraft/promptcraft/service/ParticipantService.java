@@ -11,7 +11,7 @@ public interface ParticipantService {
 
     List<ParticipantResponse> getAllMembers(Long projectId, Long userId);
 
-    List<ParticipantResponse> inviteParticipant(Long projectId, InviteParticipantRequest request, Long userId);
+    ParticipantResponse inviteParticipant(Long projectId, InviteParticipantRequest request, Long userId);
 
     ParticipantResponse updateParticipantRole(Long projectId, Long particpantId, UpdateParticipantRole request, Long userId);
 
