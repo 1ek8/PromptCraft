@@ -4,6 +4,7 @@ import com.promptcraft.promptcraft.dto.participant.InviteParticipantRequest;
 import com.promptcraft.promptcraft.dto.participant.ParticipantResponse;
 import com.promptcraft.promptcraft.dto.participant.UpdateParticipantRole;
 import com.promptcraft.promptcraft.service.ParticipantService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class ParticipantController {
     @PostMapping
     public ResponseEntity<ParticipantResponse> inviteMember(
             @PathVariable Long projectId,
-            @RequestBody InviteParticipantRequest request
+            @RequestBody @Valid InviteParticipantRequest request
             ){
         Long userId = 1L;
         return ResponseEntity.status(HttpStatus.CREATED).body(participantService.inviteParticipant(projectId, request, userId));
@@ -36,19 +37,20 @@ public class ParticipantController {
     public ResponseEntity<ParticipantResponse> updatePartipcpantRole(
             @PathVariable Long projectId,
             @PathVariable Long particpantId,
-            @RequestBody UpdateParticipantRole request
+            @RequestBody @Valid UpdateParticipantRole request
     ){
         Long userId = 1L;
         return ResponseEntity.ok(participantService.updateParticipantRole(projectId, particpantId, request, userId));
     }
 
     @DeleteMapping("/{participantId}")
-    public ResponseEntity<ParticipantResponse> deleteParticipant(
+    public ResponseEntity<Void> removeParticipant(
             @PathVariable Long projectId,
             @PathVariable Long particpantId
     ){
         Long userId = 1L;
-        return ResponseEntity.ok(participantService.deleteParticipant(projectId, particpantId, userId));
+        participantService.removeParticipant(projectId, particpantId, userId);
+        return ResponseEntity.noContent().build();
     }
 
 

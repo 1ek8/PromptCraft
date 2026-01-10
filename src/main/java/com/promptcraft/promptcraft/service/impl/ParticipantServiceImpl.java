@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import java.util.List;
 @Service
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
+@Transactional
 public class ParticipantServiceImpl implements ParticipantService {
 
     ParticipantRepository participantRepository;
@@ -79,11 +81,35 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Override
     public ParticipantResponse updateParticipantRole(Long projectId, Long particpantId, UpdateParticipantRole request, Long userId) {
-        return null;
+        Project project = projectRepository.findAccessibleProjectById(projectId, userId). orElseThrow();
+
+        if(!project.getOwner().getId().equals(userId)) {
+            throw new RuntimeException("Not allowed");
+        }
+
+        ProjectParticipantId participantId = new ProjectParticipantId(projectId, particpantId);
+        ProjectParticipant participant = participantRepository.findById(participantId).orElseThrow();
+
+        participant.setProjectRole(request.role());
+        participantRepository.save(participant);
+        return participantMapper.toParticipantResponseFromParticipant(participant);
     }
 
     @Override
-    public ParticipantResponse deleteParticipant(Long projectId, Long particpantId, Long userId) {
-        return null;
+    public void removeParticipant(Long projectId, Long particpantId, Long userId) {
+
+        Project project = projectRepository.findAccessibleProjectById(projectId, userId). orElseThrow();
+
+        if(!project.getOwner().getId().equals(userId)) {
+            throw new RuntimeException("Not allowed");
+        }
+
+        ProjectParticipantId participantId = new ProjectParticipantId(projectId, particpantId);
+        if(!participantRepository.existsById(participantId)) {
+            throw new RuntimeException("Participant not found in the project");
+        }
+        ProjectParticipant participant = participantRepository.findById(participantId).orElseThrow();
+
+        participantRepository.deleteById(participantId);
     }
 }
