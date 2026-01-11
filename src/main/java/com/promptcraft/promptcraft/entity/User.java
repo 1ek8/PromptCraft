@@ -23,13 +23,13 @@ public class User   {
     Long id;
 
     @Column(nullable = false, unique = true)
-    String email;
+    String username;
 
     @Column(nullable = false)
     String name;
 
     @Column(nullable = false)
-    String passwordHash;
+    String password;
 
     String avatarUrl;
 

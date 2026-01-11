@@ -6,9 +6,9 @@ import jakarta.validation.constraints.Size;
 
 public record LoginRequest(
 
-        @Email(message = "Input needs to be email")
+//        @Email(message = "Input needs to be email")
         @NotBlank(message = "Input cant be blank")
-        String email,
+        String username,
 
         @Size(min=5)
         String password

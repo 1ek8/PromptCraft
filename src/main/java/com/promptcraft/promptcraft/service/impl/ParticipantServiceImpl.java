@@ -63,7 +63,7 @@ public class ParticipantServiceImpl implements ParticipantService {
 //        }
 //        this can be done using spring security itself while authenticating and authorizing
 
-        User invited = userRepository.findByEmail(request.email()).orElseThrow();
+        User invited = userRepository.findByUsername(request.username()).orElseThrow();
 
         ProjectParticipantId projectParticipantId = new ProjectParticipantId(projectId, invited.getId());
 

@@ -14,7 +14,7 @@ public interface ParticipantMapper {
     ParticipantResponse toParticipantResponseFromOwner(User owner);
 
     @Mapping(target = "userId", source = "user.id") //nested mapping
-    @Mapping(target = "email", source = "user.email")
+    @Mapping(target = "username", source = "user.username")
     @Mapping(target = "name", source = "user.name")
     ParticipantResponse toParticipantResponseFromParticipant(ProjectParticipant projectParticipant);
 
