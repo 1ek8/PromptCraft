@@ -33,9 +33,9 @@ public class Project {
 
     //    aim should be to have single source of truth. if i need to know owner of a project, it can be known by checking the projectParticipant entity
     //join columns always have their indexes auto-made
-    @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
-    User owner;
+//    @ManyToOne
+//    @JoinColumn(name = "owner_id", nullable = false)
+//    User owner;
 
     @Builder.Default
     Boolean isPublic = false;

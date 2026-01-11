@@ -38,14 +38,18 @@ public class ParticipantServiceImpl implements ParticipantService {
 
         Project project = projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow();
 
-        List<ParticipantResponse> memberRepsonseList = new ArrayList<>();
-        memberRepsonseList.add(participantMapper.toParticipantResponseFromOwner(project.getOwner()));
+//        List<ParticipantResponse> memberRepsonseList = new ArrayList<>();
+//        memberRepsonseList.add(participantMapper.toParticipantResponseFromOwner(project.getOwner()));
+//
+//        memberRepsonseList.addAll(participantRepository.findByIdProjectId(projectId)
+//                .stream()
+//                .map(participant -> participantMapper.toParticipantResponseFromParticipant(participant))
+//                .toList());
 
-        memberRepsonseList.addAll(participantRepository.findByIdProjectId(projectId)
+        List<ParticipantResponse> memberRepsonseList = participantRepository.findByIdProjectId(projectId)
                 .stream()
                 .map(participant -> participantMapper.toParticipantResponseFromParticipant(participant))
-                .toList());
-
+                .toList();
 
         return memberRepsonseList;
     }
@@ -54,9 +58,10 @@ public class ParticipantServiceImpl implements ParticipantService {
     public ParticipantResponse inviteParticipant(Long projectId, InviteParticipantRequest request, Long userId) {
         Project project = projectRepository.findAccessibleProjectById(projectId, userId). orElseThrow();
 
-        if(!project.getOwner().getId().equals(userId)) {
-            throw new RuntimeException("Not allowed");
-        }
+//        if(!project.getOwner().getId().equals(userId)) {
+//            throw new RuntimeException("Not allowed");
+//        }
+//        this can be done using spring security itself while authenticating and authorizing
 
         User invited = userRepository.findByEmail(request.email()).orElseThrow();
 
@@ -83,9 +88,9 @@ public class ParticipantServiceImpl implements ParticipantService {
     public ParticipantResponse updateParticipantRole(Long projectId, Long particpantId, UpdateParticipantRole request, Long userId) {
         Project project = projectRepository.findAccessibleProjectById(projectId, userId). orElseThrow();
 
-        if(!project.getOwner().getId().equals(userId)) {
-            throw new RuntimeException("Not allowed");
-        }
+//        if(!project.getOwner().getId().equals(userId)) {
+//            throw new RuntimeException("Not allowed");
+//        }
 
         ProjectParticipantId participantId = new ProjectParticipantId(projectId, particpantId);
         ProjectParticipant participant = participantRepository.findById(participantId).orElseThrow();
@@ -100,9 +105,9 @@ public class ParticipantServiceImpl implements ParticipantService {
 
         Project project = projectRepository.findAccessibleProjectById(projectId, userId). orElseThrow();
 
-        if(!project.getOwner().getId().equals(userId)) {
-            throw new RuntimeException("Not allowed");
-        }
+//        if(!project.getOwner().getId().equals(userId)) {
+//            throw new RuntimeException("Not allowed");
+//        }
 
         ProjectParticipantId participantId = new ProjectParticipantId(projectId, particpantId);
         if(!participantRepository.existsById(participantId)) {

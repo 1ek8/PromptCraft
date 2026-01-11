@@ -5,8 +5,12 @@ import com.promptcraft.promptcraft.dto.project.ProjectRequest;
 import com.promptcraft.promptcraft.dto.project.ProjectResponse;
 import com.promptcraft.promptcraft.dto.project.ProjectSummaryResponse;
 import com.promptcraft.promptcraft.entity.Project;
+import com.promptcraft.promptcraft.entity.ProjectParticipant;
+import com.promptcraft.promptcraft.entity.ProjectParticipantId;
 import com.promptcraft.promptcraft.entity.User;
+import com.promptcraft.promptcraft.entity.enums.ProjectRole;
 import com.promptcraft.promptcraft.mapper.ProjectMapper;
+import com.promptcraft.promptcraft.repository.ParticipantRepository;
 import com.promptcraft.promptcraft.repository.ProjectRepository;
 import com.promptcraft.promptcraft.repository.UserRepository;
 import com.promptcraft.promptcraft.service.ProjectService;
@@ -28,6 +32,7 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectRepository projectRepository;
     UserRepository userRepository;
     ProjectMapper projectMapper;
+    private final ParticipantRepository participantRepository;
 
 
     @Override
@@ -55,10 +60,21 @@ public class ProjectServiceImpl implements ProjectService {
 
         Project project = Project.builder()
                 .name(request.name())
-                .owner(owner)
+//                .owner(owner)
                 .build();
 
         project = projectRepository.save(project);
+
+        ProjectParticipantId participantId = new ProjectParticipantId(project.getId(), owner.getId());
+        ProjectParticipant participant = ProjectParticipant.builder()
+                .projectRole(ProjectRole.OWNER)
+                .user(owner)
+                .acceptedAt(Instant.now())
+                .invitedAt(Instant.now())
+                .project(project)
+                .build();
+
+        participantRepository.save(participant);
 
         return projectMapper.toProjectResponse(project);
     }
@@ -78,9 +94,9 @@ public class ProjectServiceImpl implements ProjectService {
     public void softDelete(Long id, Long userId) {
         Project project = projectRepository.findAccessibleProjectById(id, userId).orElseThrow();
 
-        if(!project.getOwner().getId().equals(userId)) {
-            throw new RuntimeException("Only a project's owner can delete a probject");
-        }
+//        if(!project.getOwner().getId().equals(userId)) {
+//            throw new RuntimeException("Only a project's owner can delete a probject");
+//        }
 
         project.setDeletedAt(Instant.now());
         projectRepository.save(project);
