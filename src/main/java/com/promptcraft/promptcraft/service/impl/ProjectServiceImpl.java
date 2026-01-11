@@ -1,5 +1,6 @@
 package com.promptcraft.promptcraft.service.impl;
 
+import com.promptcraft.promptcraft.advice.exceptions.ResourceNotFoundException;
 import com.promptcraft.promptcraft.dto.project.ProjectRequest;
 import com.promptcraft.promptcraft.dto.project.ProjectResponse;
 import com.promptcraft.promptcraft.dto.project.ProjectSummaryResponse;
@@ -17,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +43,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectResponse getProjectById(Long projectId, Long userId) {
-        Project project = projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow();
+        Project project = projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow(
+                () -> new ResourceNotFoundException("Project", projectId.toString())
+        );
         return projectMapper.toProjectResponse(project);
     }
 

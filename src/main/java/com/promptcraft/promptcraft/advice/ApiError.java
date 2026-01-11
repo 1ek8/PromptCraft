@@ -1,16 +1,27 @@
 package com.promptcraft.promptcraft.advice;
-
-import lombok.Builder;
-import lombok.Data;
 import org.springframework.http.HttpStatus;
-
+import java.time.Instant;
 import java.util.List;
 
-@Data
-@Builder
-public class ApiError {
+public record ApiError(
 
-    private HttpStatus status;
-    private String message;
-    private List<String> subErrors;
+        HttpStatus status,
+        String message,
+        Instant timestamp,
+        List<ApiFieldError> errors
+
+) {
+
+    public ApiError(HttpStatus status, String message) {
+        this(status, message, Instant.now(), null); // Sets a default timestamp
+    }
+
+    public ApiError(HttpStatus status, String message, List<ApiFieldError> errors) {
+        this(status, message, Instant.now(), errors); // Sets a default timestamp
+    }
+
+}
+
+record ApiFieldError(String field, String message) {
+
 }
