@@ -1,5 +1,6 @@
 package com.promptcraft.promptcraft.advice.exceptions;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

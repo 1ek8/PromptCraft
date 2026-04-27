@@ -18,6 +18,7 @@ import java.util.List;
 public class ParticipantController {
 
     private final ParticipantService participantService;
+
     @GetMapping
     public ResponseEntity<List<ParticipantResponse>> getAllMembers(@PathVariable Long projectId){
         Long userId = 1L;

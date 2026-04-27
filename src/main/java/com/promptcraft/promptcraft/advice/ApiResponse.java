@@ -1,25 +1,33 @@
-package com.promptcraft.promptcraft.advice;
+    package com.promptcraft.promptcraft.advice;
 
-import lombok.Data;
+    import com.fasterxml.jackson.annotation.JsonInclude;
+    import lombok.Data;
 
-import java.time.LocalDateTime;
+    import java.time.LocalDateTime;
 
-@Data
-public class ApiResponse<T> {
+    @Data
+    public class ApiResponse<T> {
 
-    private LocalDateTime timeStamp;
-    private T data;
-    private ApiError error;
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private LocalDateTime timeStamp;
 
-    public ApiResponse() { this.timeStamp = LocalDateTime.now(); }
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private T data;
 
-    public ApiResponse(T data) {
-        this();
-        this.data = data;
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private ApiError error;
+
+        public ApiResponse() {
+            this.timeStamp = LocalDateTime.now();
+        }
+
+        public ApiResponse(T data) {
+            this();
+            this.data = data;
+        }
+
+        public ApiResponse(ApiError error) {
+    //        this();
+            this.error = error;
+        }
     }
-
-    public ApiResponse(ApiError error) {
-        this();
-        this.error = error;
-    }
-}
