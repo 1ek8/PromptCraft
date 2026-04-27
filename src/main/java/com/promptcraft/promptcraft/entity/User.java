@@ -31,7 +31,7 @@ public class User   {
     @Column(nullable = false)
     String password;
 
-    String avatarUrl;
+//    String avatarUrl;
 
     @CreationTimestamp
     Instant createdAt;

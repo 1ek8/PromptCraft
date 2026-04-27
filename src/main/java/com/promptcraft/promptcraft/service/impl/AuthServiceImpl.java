@@ -40,6 +40,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
+
+//        User user = userRepository.findByUsername(request.username()).orElseThrow(
+//                 throw new BadRequestException("No user with username " + request.username() + "exists in the database");
+//        );
+
         return null;
     }
 }

@@ -35,3 +35,5 @@ build/
 #AI tools
 .repomixignore
 repomix-output.xml
+
+src/main/resources/application.yaml

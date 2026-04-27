@@ -22,6 +22,7 @@ import java.time.Instant;
         @Index(name = "idx_projects_deleted_at", columnList = "deletedAt"),
     }
 )
+
 public class Project {
 
     @Id
