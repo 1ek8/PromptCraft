@@ -90,7 +90,7 @@ class ProjectServiceImplTest {
                 .thenReturn(mockResponses);
 
         // Execute
-        List<ProjectSummaryResponse> result = projectService.getUserProjects(userId);
+        List<ProjectSummaryResponse> result = projectService.getUserProjects();
 
         // Assert
         assertNotNull(result);

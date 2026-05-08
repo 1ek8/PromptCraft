@@ -11,6 +11,7 @@ import com.promptcraft.promptcraft.mapper.ParticipantMapper;
 import com.promptcraft.promptcraft.repository.ParticipantRepository;
 import com.promptcraft.promptcraft.repository.ProjectRepository;
 import com.promptcraft.promptcraft.repository.UserRepository;
+import com.promptcraft.promptcraft.security.AuthUtil;
 import com.promptcraft.promptcraft.service.ParticipantService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +32,14 @@ public class ParticipantServiceImpl implements ParticipantService {
     ParticipantRepository participantRepository;
     ProjectRepository projectRepository;
     ParticipantMapper participantMapper;
+
     private final UserRepository userRepository;
+    private final AuthUtil authUtil;
 
     @Override
-    public List<ParticipantResponse> getAllMembers(Long projectId, Long userId) {
+    public List<ParticipantResponse> getAllMembers(Long projectId) {
 
+        Long userId = authUtil.getCurrentUserId();
         Project project = projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow();
 
 //        List<ParticipantResponse> memberRepsonseList = new ArrayList<>();
@@ -55,7 +59,8 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public ParticipantResponse inviteParticipant(Long projectId, InviteParticipantRequest request, Long userId) {
+    public ParticipantResponse inviteParticipant(Long projectId, InviteParticipantRequest request) {
+        Long userId = authUtil.getCurrentUserId();
         Project project = projectRepository.findAccessibleProjectById(projectId, userId). orElseThrow();
 
 //        if(!project.getOwner().getId().equals(userId)) {
@@ -85,7 +90,8 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public ParticipantResponse updateParticipantRole(Long projectId, Long particpantId, UpdateParticipantRole request, Long userId) {
+    public ParticipantResponse updateParticipantRole(Long projectId, Long particpantId, UpdateParticipantRole request) {
+        Long userId = authUtil.getCurrentUserId();
         Project project = projectRepository.findAccessibleProjectById(projectId, userId). orElseThrow();
 
 //        if(!project.getOwner().getId().equals(userId)) {
@@ -101,7 +107,8 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public void removeParticipant(Long projectId, Long particpantId, Long userId) {
+    public void removeParticipant(Long projectId, Long particpantId) {
+        Long userId = authUtil.getCurrentUserId();
 
         Project project = projectRepository.findAccessibleProjectById(projectId, userId). orElseThrow();
 

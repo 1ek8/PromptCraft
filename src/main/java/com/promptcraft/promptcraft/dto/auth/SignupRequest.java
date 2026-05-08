@@ -9,9 +9,11 @@ public record SignupRequest(
         @NotBlank(message = "Input cant be blank")
         String username,
 
+        @NotBlank
         @Size(min=3, max=30)
         String name,
 
+        @NotBlank
         @Size(min=5)
         String password
 ) {

@@ -13,6 +13,7 @@ import com.promptcraft.promptcraft.mapper.ProjectMapper;
 import com.promptcraft.promptcraft.repository.ParticipantRepository;
 import com.promptcraft.promptcraft.repository.ProjectRepository;
 import com.promptcraft.promptcraft.repository.UserRepository;
+import com.promptcraft.promptcraft.security.AuthUtil;
 import com.promptcraft.promptcraft.service.ProjectService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -34,20 +35,22 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectMapper projectMapper;
     ParticipantRepository participantRepository;
 
+    private final AuthUtil authUtil;
 
     @Override
     //this method shouldnt just fetch the list of projects taht the user owns but also the projects where the user is a participant
-    public List<ProjectSummaryResponse> getUserProjects(Long userId) {
+    public List<ProjectSummaryResponse> getUserProjects() {
 //        return projectRepository.findAllProjectsAccessibleByUser(userId)
 //                .stream()
 //                .map(project -> projectMapper.toProjectSummaryResponse(project))
 //                .collect(Collectors.toList());
-
+        Long userId = authUtil.getCurrentUserId();
         return projectMapper.toListOfProjectSummaryRepsonse(projectRepository.findAllProjectsAccessibleByUser(userId));
     }
 
     @Override
-    public ProjectResponse getProjectById(Long projectId, Long userId) {
+    public ProjectResponse getProjectById(Long projectId) {
+        Long userId = authUtil.getCurrentUserId();
         Project project = projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow(
                 () -> new ResourceNotFoundException("Project", projectId.toString())
         );
@@ -55,7 +58,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectResponse createProject(ProjectRequest request, Long userId) {
+    public ProjectResponse createProject(ProjectRequest request ) {
+        Long userId = authUtil.getCurrentUserId();
         User owner = userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException("User", userId.toString())
         );
@@ -82,7 +86,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectResponse updateProject(Long id, ProjectRequest request, Long userId) {
+    public ProjectResponse updateProject(Long id, ProjectRequest request) {
+        Long userId = authUtil.getCurrentUserId();
         Project project = projectRepository.findAccessibleProjectById(id, userId).orElseThrow();
 
         project.setName(request.name());
@@ -93,7 +98,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void softDelete(Long id, Long userId) {
+    public void softDelete(Long id) {
+        Long userId = authUtil.getCurrentUserId();
         Project project = projectRepository.findAccessibleProjectById(id, userId).orElseThrow();
 
 //        if(!project.getOwner().getId().equals(userId)) {
@@ -105,7 +111,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    public Project getAccessibleProjectById(Long id, Long userId) {
+    public Project getAccessibleProjectById(Long id) {
+        Long userId = authUtil.getCurrentUserId();
         return projectRepository.findAccessibleProjectById(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project", id.toString()));
     }

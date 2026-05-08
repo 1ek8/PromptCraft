@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface ParticipantService {
 
-    List<ParticipantResponse> getAllMembers(Long projectId, Long userId);
+    List<ParticipantResponse> getAllMembers(Long projectId);
 
-    ParticipantResponse inviteParticipant(Long projectId, InviteParticipantRequest request, Long userId);
+    ParticipantResponse inviteParticipant(Long projectId, InviteParticipantRequest request);
 
-    ParticipantResponse updateParticipantRole(Long projectId, Long particpantId, UpdateParticipantRole request, Long userId);
+    ParticipantResponse updateParticipantRole(Long projectId, Long particpantId, UpdateParticipantRole request);
 
-    void removeParticipant(Long projectId, Long particpantId, Long userId);
+    void removeParticipant(Long projectId, Long particpantId);
 }

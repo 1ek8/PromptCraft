@@ -21,8 +21,7 @@ public class ParticipantController {
 
     @GetMapping
     public ResponseEntity<List<ParticipantResponse>> getAllMembers(@PathVariable Long projectId){
-        Long userId = 1L;
-        return ResponseEntity.ok(participantService.getAllMembers(projectId, userId));
+        return ResponseEntity.ok(participantService.getAllMembers(projectId));
     }
 
     @PostMapping
@@ -30,8 +29,7 @@ public class ParticipantController {
             @PathVariable Long projectId,
             @RequestBody @Valid InviteParticipantRequest request
             ){
-        Long userId = 1L;
-        return ResponseEntity.status(HttpStatus.CREATED).body(participantService.inviteParticipant(projectId, request, userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(participantService.inviteParticipant(projectId, request));
     }
 
     @PatchMapping("/{participantId}")
@@ -40,8 +38,7 @@ public class ParticipantController {
             @PathVariable Long particpantId,
             @RequestBody @Valid UpdateParticipantRole request
     ){
-        Long userId = 1L;
-        return ResponseEntity.ok(participantService.updateParticipantRole(projectId, particpantId, request, userId));
+        return ResponseEntity.ok(participantService.updateParticipantRole(projectId, particpantId, request));
     }
 
     @DeleteMapping("/{participantId}")
@@ -49,8 +46,7 @@ public class ParticipantController {
             @PathVariable Long projectId,
             @PathVariable Long particpantId
     ){
-        Long userId = 1L;
-        participantService.removeParticipant(projectId, particpantId, userId);
+        participantService.removeParticipant(projectId, particpantId);
         return ResponseEntity.noContent().build();
     }
 
