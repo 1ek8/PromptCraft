@@ -18,6 +18,7 @@ import com.promptcraft.promptcraft.service.ProjectService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +50,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("@security.canViewProject(#projectId)")
     public ProjectResponse getProjectById(Long projectId) {
         Long userId = authUtil.getCurrentUserId();
         Project project = projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow(
@@ -60,9 +62,11 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectResponse createProject(ProjectRequest request ) {
         Long userId = authUtil.getCurrentUserId();
-        User owner = userRepository.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("User", userId.toString())
-        );
+//        User owner = userRepository.findById(userId).orElseThrow(
+//                () -> new ResourceNotFoundException("User", userId.toString())
+//        );
+
+        User owner = userRepository.getReferenceById(userId);
 
         Project project = Project.builder()
                 .name(request.name())

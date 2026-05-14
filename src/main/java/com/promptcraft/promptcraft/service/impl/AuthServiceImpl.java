@@ -15,6 +15,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -55,10 +56,12 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(request.username(), request.password())
         );
 
-        User user = (User) authentication.getPrincipal();
+//        User user = (User) authentication.getPrincipal();
+        UserDetails principal = (UserDetails) authentication.getPrincipal();
+        User user = userRepository.findByUsername(principal.getUsername())
+                .orElseThrow(() -> new BadRequestException("No user with username " + principal.getUsername() + " exists in the database"));
 
         String token = authUtil.generateAccessToken(user);
-
         return new AuthResponse(token, userMapper.toUserProfileResponse(user));
     }
 }

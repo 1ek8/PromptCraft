@@ -12,30 +12,45 @@ import java.util.Optional;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long> {
 
-    //project_table is the name of the entity in hibernate domain, this query is for the JPA domain
+    //project_table is the name of the entity in hibernate domain, this query is for the  JPA domain
     @Query("""
             SELECT p FROM Project p
-            INNER JOIN ProjectParticipant pp
-            ON p.id = pp.id.projectId
-            WHERE pp.id.userId = :userId
-            AND pp.projectRole = 
-            com.promptcraft.promptcraft.entity.enums.ProjectRole.OWNER
-            AND p.deletedAt IS NULL
+            WHERE p.deletedAt IS NULL
+            AND EXISTS (
+                SELECT 1 FROM ProjectParticipant pp
+                WHERE pp.id.userId = :userId
+                AND pp.id.projectId = p.id
+            )
             ORDER BY p.updatedAt DESC
             """)
-
+//            SELECT p FROM Project p
+//            INNER JOIN ProjectParticipant pp
+//            ON p.id = pp.id.projectId
+//            WHERE pp.id.userId = :userId
+//            AND pp.projectRole =
+//            com.promptcraft.promptcraft.entity.enums.ProjectRole.OWNER
+//            AND p.deletedAt IS NULL
+//            ORDER BY p.updatedAt DESC
     List<Project> findAllProjectsAccessibleByUser(@Param("userId") Long userId);
 
     @Query("""
             SELECT p from Project p
-            INNER JOIN ProjectParticipant pp
-            ON p.id = pp.id.projectId
             WHERE p.id = :projectId
-            AND pp.projectRole = 
-            com.promptcraft.promptcraft.entity.enums.ProjectRole.OWNER
             AND p.deletedAt IS NULL
-            AND pp.id.userId = :userId
+            AND EXISTS (
+                SELECT 1 FROM ProjectParticipant pp
+                WHERE pp.id.userId = :userId
+                AND pp.id.projectId = p.id
+            )
             """)
+//    SELECT p from Project p
+//    INNER JOIN ProjectParticipant pp
+//    ON p.id = pp.id.projectId
+//    WHERE p.id = :projectId
+//    AND pp.projectRole =
+//    com.promptcraft.promptcraft.entity.enums.ProjectRole.OWNER
+//    AND p.deletedAt IS NULL
+//    AND pp.id.userId = :userId
     Optional<Project> findAccessibleProjectById(@Param("projectId") Long projectId,
                                                 @Param("userId") Long userId);
 }
