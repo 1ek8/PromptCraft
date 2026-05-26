@@ -18,3 +18,12 @@ spring:
 
 jwt:
   secret-key: my-jwt-secret-key-which-is-hopefully-256-bits-long
+
+stripe:
+  api:
+    secret: ${STRIPE_TEST_SECRET_KEY:sk_test_placeholder}
+  webhook:
+    secret: whsec_659523b32d50f5a69021628904449886b8188e01e2da64ac2ce0f2cd863a0aed
+
+client:
+  url: http://localhost:8080/

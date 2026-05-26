@@ -16,6 +16,7 @@ import com.promptcraft.promptcraft.service.ParticipantService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final AuthUtil authUtil;
 
     @Override
+    @PreAuthorize("@security.canViewMembers(#projectId)")
     public List<ParticipantResponse> getAllMembers(Long projectId) {
 
         Long userId = authUtil.getCurrentUserId();
@@ -59,6 +61,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
+    @PreAuthorize("@security.canManageMembers(#projectId)")
     public ParticipantResponse inviteParticipant(Long projectId, InviteParticipantRequest request) {
         Long userId = authUtil.getCurrentUserId();
         Project project = projectRepository.findAccessibleProjectById(projectId, userId). orElseThrow();
@@ -90,6 +93,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
+    @PreAuthorize("@security.canManageMembers(#projectId)")
     public ParticipantResponse updateParticipantRole(Long projectId, Long particpantId, UpdateParticipantRole request) {
         Long userId = authUtil.getCurrentUserId();
         Project project = projectRepository.findAccessibleProjectById(projectId, userId). orElseThrow();
@@ -107,6 +111,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
+    @PreAuthorize("@security.canManageMembers(#projectId)")
     public void removeParticipant(Long projectId, Long particpantId) {
         Long userId = authUtil.getCurrentUserId();
 

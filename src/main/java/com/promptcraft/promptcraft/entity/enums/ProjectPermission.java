@@ -8,12 +8,11 @@ import lombok.RequiredArgsConstructor;
 public enum ProjectPermission {
 
     VIEW("project:view"),
-
     EDIT("project:edit"),
-
     DELETE("project:delete"),
 
-    MANAGE_MEMBERS("project:manage_members");
+    MANAGE_MEMBERS("project_members:manage_members"),
+    VIEW_MEMBERS("project_members:view_members");
 
 
     private final String value;

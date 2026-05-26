@@ -21,17 +21,16 @@ public class User   {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long Id;
-
     @Column(nullable = false, unique = true)
     String username;
-
     @Column(nullable = false)
     String name;
-
     @Column(nullable = false)
     String password;
 
 //    String avatarUrl;
+    @Column(unique = true)
+    String stripeCustomerId;
 
     @CreationTimestamp
     Instant createdAt;

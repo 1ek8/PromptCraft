@@ -11,7 +11,7 @@ import static com.promptcraft.promptcraft.entity.enums.ProjectPermission.*;
 @Getter
 public enum ProjectRole {
 
-    OWNER(Set.of(VIEW, EDIT, DELETE, MANAGE_MEMBERS)),
+    OWNER(Set.of(VIEW, EDIT, DELETE, MANAGE_MEMBERS, VIEW_MEMBERS)),
 
     EDITOR(Set.of(VIEW, EDIT)),
 

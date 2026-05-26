@@ -1,10 +1,7 @@
 package com.promptcraft.promptcraft.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,12 +19,11 @@ public class Plan {
 
     String name;
 
+    @Column(unique = true)
     String stripePriceId;
 
     Integer maxProjects;
-
     Integer maxTokensPerDay;
-
     Integer maxPreviews;
 
     Boolean active;

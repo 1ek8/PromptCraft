@@ -13,7 +13,8 @@ public class SecurityExpressions {
     private final ParticipantRepository participantRepository;
     private final AuthUtil authUtil;
 
-    public boolean canViewProject(Long projectId) {
+    public boolean hasPermission(Long projectId, ProjectPermission permission){
+
         Long userId = authUtil.getCurrentUserId();
 
         return participantRepository.findRoleByProjectIdAndUserId(projectId, userId)
@@ -21,12 +22,33 @@ public class SecurityExpressions {
                 .orElse(false);
     }
 
-    public boolean canEditProject(Long projectId) {
-        Long userId = authUtil.getCurrentUserId();
+    public boolean canViewProject(Long projectId) {
 
-        return participantRepository.findRoleByProjectIdAndUserId(projectId, userId)
-                .map(role -> role.getPermissions().contains(ProjectPermission.EDIT))
-                .orElse(false);
+        return hasPermission(projectId, ProjectPermission.VIEW);
+
     }
 
+    public boolean canEditProject(Long projectId) {
+
+        return hasPermission(projectId, ProjectPermission.EDIT);
+
+    }
+
+    public boolean canDeleteProject(Long projectId) {
+
+        return hasPermission(projectId, ProjectPermission.DELETE);
+
+    }
+
+    public boolean canViewMembers(Long projectId) {
+
+        return hasPermission(projectId, ProjectPermission.VIEW_MEMBERS);
+
+    }
+
+    public boolean canManageMembers(Long projectId) {
+
+        return hasPermission(projectId, ProjectPermission.MANAGE_MEMBERS);
+
+    }
 }
