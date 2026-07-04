@@ -16,6 +16,15 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+ai:
+  openai:
+    api-key: https://openrouter.ai/api
+    chat:
+      options:
+        model:
+        temperature: 0.0
+
+
 jwt:
   secret-key: my-jwt-secret-key-which-is-hopefully-256-bits-long
 
