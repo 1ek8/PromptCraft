@@ -1,30 +1,45 @@
 package com.promptcraft.promptcraft.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 
 @Entity
+@Table(name = "chat_sessions")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChatSession {
 
     @Id
-    @OneToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_id", nullable = false)
+    private ChatSessionId id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @MapsId("projectId")
+    @JoinColumn(name = "project_id", nullable = false, updatable = false)
     Project project;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @MapsId("userId")
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
     User user;
 
-    String title;
+//    String title;
 
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     Instant createdAt;
 
+    @UpdateTimestamp
     Instant updatedAt;
 
     Instant deletedAt;

@@ -7,18 +7,22 @@ import com.promptcraft.promptcraft.entity.Subscription;
 import com.promptcraft.promptcraft.entity.User;
 import com.promptcraft.promptcraft.entity.enums.SubscriptionStatus;
 import com.promptcraft.promptcraft.mapper.SubscriptionMapper;
+import com.promptcraft.promptcraft.repository.ParticipantRepository;
 import com.promptcraft.promptcraft.repository.PlanRepository;
 import com.promptcraft.promptcraft.repository.SubscriptionRepository;
 import com.promptcraft.promptcraft.repository.UserRepository;
 import com.promptcraft.promptcraft.security.AuthUtil;
 import com.promptcraft.promptcraft.service.SubscriptionService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Set;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
 
@@ -27,6 +31,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final SubscriptionMapper subscriptionMapper;
     private final UserRepository userRepository;
     private final PlanRepository planRepository;
+    private final ParticipantRepository participantRepository;
+    private final Integer FREE_TIER_PROJECTS_ALLOWED = 1;
 
     @Override
     public SubscriptionResponse getCurrentSusbscription() {
@@ -61,13 +67,33 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
+    @Transactional
     public void updateSubscription(String subId, SubscriptionStatus status, Instant periodStart, Instant periodEnd, Boolean cancelAtPeriodEnd, Long planId) {
+        Subscription subscription = getSubscription(subId);
+        boolean hasSubscriptionBeenUpdated = false;
 
+        if(status != null && status != subscription.getStatus()){
+            subscription.setStatus(status);
+            hasSubscriptionBeenUpdated = true;
+        }
+
+        //could check for each of the below fields too like i did above, but didn't
+        subscription.setCurrentPeriodStart(periodStart);
+        subscription.setCurrentPeriodEnd(periodEnd);
+        subscription.setCanceledAtPeriodEnd(cancelAtPeriodEnd);
+        subscription.setPlan(getPlan(planId));
+
+        if(hasSubscriptionBeenUpdated){
+            log.debug("Subscription has been updated: {}", subId);
+            subscriptionRepository.save(subscription);
+        }
     }
 
     @Override
-    public void cancelSubscription(String id) {
-
+    public void cancelSubscription(String subId) {
+        Subscription subscription = getSubscription(subId);
+        subscription.setStatus(SubscriptionStatus.CANCELLED);
+        subscriptionRepository.save(subscription);
     }
 
     @Override
@@ -84,10 +110,32 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     }
 
-
     @Override
     public void markSubscriptionPastDue(String subId) {
+        Subscription subscription = getSubscription(subId);
+        if(subscription.getStatus() == SubscriptionStatus.PAST_DUE) {
+            log.debug("Subscription already past due: {}", subId);
+            return;
+        }
 
+        subscription.setStatus(SubscriptionStatus.PAST_DUE);
+        subscriptionRepository.save(subscription);
+
+        //TODO: notify user via email/notif
+    }
+
+    @Override
+    public boolean canCreateNewProject() {
+
+        Long userId = authUtil.getCurrentUserId();
+        SubscriptionResponse currentSubscription = getCurrentSusbscription();
+        int countOfOwnedProjects = participantRepository.countProjectOwnedByUser(userId);
+
+        if(currentSubscription.plan() == null){
+            return countOfOwnedProjects < FREE_TIER_PROJECTS_ALLOWED;
+        }
+
+        return countOfOwnedProjects < currentSubscription.plan().maxProjects();
     }
 
     private User getUser(Long userId) {

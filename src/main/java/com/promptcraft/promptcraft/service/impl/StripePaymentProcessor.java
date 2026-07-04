@@ -1,5 +1,6 @@
 package com.promptcraft.promptcraft.service.impl;
 
+import com.promptcraft.promptcraft.advice.exceptions.BadRequestException;
 import com.promptcraft.promptcraft.advice.exceptions.ResourceNotFoundException;
 import com.promptcraft.promptcraft.dto.subscription.CheckoutRequest;
 import com.promptcraft.promptcraft.dto.subscription.CheckoutResponse;
@@ -71,7 +72,27 @@ public class StripePaymentProcessor implements PaymentProcessor {
 
     @Override
     public PortalResponse openCustomerPortal() {
-        return null;
+
+        Long userId = authUtil.getCurrentUserId();
+        User user = getUser(userId);
+        String stripeCustomerId = user.getStripeCustomerId();
+
+        if(stripeCustomerId == null || stripeCustomerId.isEmpty()){
+            throw  new BadRequestException("User doesn't have a stripe customer id for userId: " + userId);
+        }
+
+        try {
+            var portalSession = com.stripe.model.billingportal.Session.create(
+                    com.stripe.param.billingportal.SessionCreateParams.builder()
+                            .setCustomer(stripeCustomerId)
+                            .setReturnUrl(frontendUrl)
+                            .build()
+            );
+
+            return new PortalResponse(portalSession.getUrl());
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -127,7 +148,7 @@ public class StripePaymentProcessor implements PaymentProcessor {
 
         Long planId = resolvePlanId(item.getPrice());
 
-        subscriptionService.updateSubscripiton(
+        subscriptionService.updateSubscription(
                 subscription.getId(), status, periodStart, periodEnd,
                 subscription.getCancelAtPeriodEnd(), planId
         );

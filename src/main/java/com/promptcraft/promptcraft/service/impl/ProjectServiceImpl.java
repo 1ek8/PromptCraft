@@ -1,5 +1,6 @@
 package com.promptcraft.promptcraft.service.impl;
 
+import com.promptcraft.promptcraft.advice.exceptions.BadRequestException;
 import com.promptcraft.promptcraft.advice.exceptions.ResourceNotFoundException;
 import com.promptcraft.promptcraft.dto.project.ProjectRequest;
 import com.promptcraft.promptcraft.dto.project.ProjectResponse;
@@ -15,6 +16,7 @@ import com.promptcraft.promptcraft.repository.ProjectRepository;
 import com.promptcraft.promptcraft.repository.UserRepository;
 import com.promptcraft.promptcraft.security.AuthUtil;
 import com.promptcraft.promptcraft.service.ProjectService;
+import com.promptcraft.promptcraft.service.SubscriptionService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -35,6 +37,7 @@ public class ProjectServiceImpl implements ProjectService {
     UserRepository userRepository;
     ProjectMapper projectMapper;
     ParticipantRepository participantRepository;
+    SubscriptionService subscriptionService;
 
     private final AuthUtil authUtil;
 
@@ -61,6 +64,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectResponse createProject(ProjectRequest request ) {
+
+        if(!subscriptionService.canCreateNewProject()) {
+            throw  new BadRequestException("Not allowed to create new project with Current Plan, upgrade plan to do so");
+        }
+
         Long userId = authUtil.getCurrentUserId();
 //        User owner = userRepository.findById(userId).orElseThrow(
 //                () -> new ResourceNotFoundException("User", userId.toString())
