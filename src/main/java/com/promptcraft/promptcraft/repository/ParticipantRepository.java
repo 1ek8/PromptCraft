@@ -25,7 +25,7 @@ public interface ParticipantRepository extends JpaRepository<ProjectParticipant,
 
     @Query("""
             SELECT COUNT(pm) FROM ProjectParticipant pm
-            WHERE pm.id.userId = :userId AND pm.role = 'OWNER'
+            WHERE pm.id.userId = :userId AND pm.projectRole = 'OWNER'
             """)
     int countProjectOwnedByUser(@Param("userId") Long userId);
 }

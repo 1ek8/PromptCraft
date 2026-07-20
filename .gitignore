@@ -37,3 +37,7 @@ build/
 repomix-output.xml
 
 src/main/resources/application.yaml
+
+# macOS
+.DS_Store
+**/.DS_Store

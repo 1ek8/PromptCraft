@@ -1,10 +1,10 @@
 package com.promptcraft.promptcraft.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,26 +13,34 @@ import java.util.List;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Table(name = "project_files")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class ProjectFile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long Id;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id", nullable = false)
     Project project;
 
+    @Column(nullable = false)
     String path;
 
     String minioObjectKey;
 
+    @CreationTimestamp
     Instant createdAt;
 
+    @UpdateTimestamp
     Instant updatedAt;
 
-    @OneToOne
-    User createdBy;
-
-    @OneToMany
-    List<User> updatedBy;
+//    @OneToOne
+//    User createdBy;
+//
+//    @OneToMany
+//    List<User> updatedBy;
 }
