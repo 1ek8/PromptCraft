@@ -1,6 +1,8 @@
 package com.promptcraft.promptcraft.service.impl;
 
 import com.promptcraft.promptcraft.llm.Prompt;
+import com.promptcraft.promptcraft.llm.advisors.FileTreeContextAdvisor;
+import com.promptcraft.promptcraft.llm.tools.CodeGenerationTools;
 import com.promptcraft.promptcraft.security.AuthUtil;
 import com.promptcraft.promptcraft.service.AIGenerationService;
 import com.promptcraft.promptcraft.service.FileService;
@@ -25,6 +27,7 @@ public class AIGenerationServiceImpl implements AIGenerationService {
     private final ChatClient chatClient;
     private final AuthUtil authUtil;
     private final FileService fileService;
+    private final FileTreeContextAdvisor fileTreeContextAdvisor;
 
     private static final Pattern FILE_TAG_PATTERN = Pattern.compile("<file path=\"([^\"]+)\">(.*?)</file>", Pattern.DOTALL);
 
@@ -42,11 +45,15 @@ public class AIGenerationServiceImpl implements AIGenerationService {
 
         StringBuilder fullResponseBuffer = new StringBuilder();
 
+        CodeGenerationTools codeGenerationTools = new CodeGenerationTools(fileService, projectId);
+
         return chatClient.prompt()
-                .system(Prompt.CODE_GENERATOR_SYSTEM_PROMPT)
+                .system(Prompt.CODE_GENERATOR_SYSTEM_PROMPT + "---file_tree---" + fileService.getFileTree(projectId).toString())
                 .user(message)
+                .tools(codeGenerationTools)
                 .advisors(advisorSpec -> {
                         advisorSpec.params(advisorParams);
+                        advisorSpec.advisors(fileTreeContextAdvisor);
                     }
                 )
                 .stream()

@@ -16,6 +16,7 @@ import com.promptcraft.promptcraft.repository.ProjectRepository;
 import com.promptcraft.promptcraft.repository.UserRepository;
 import com.promptcraft.promptcraft.security.AuthUtil;
 import com.promptcraft.promptcraft.service.ProjectService;
+import com.promptcraft.promptcraft.service.ProjectTemplateService;
 import com.promptcraft.promptcraft.service.SubscriptionService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectMapper projectMapper;
     ParticipantRepository participantRepository;
     SubscriptionService subscriptionService;
+    ProjectTemplateService projectTemplateService;
 
     private final AuthUtil authUtil;
 
@@ -92,6 +94,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .project(project)
                 .build();
 
+        projectTemplateService.initializeProjectFromTemplate(project.getId());
         participantRepository.save(participant);
 
         return projectMapper.toProjectResponse(project);

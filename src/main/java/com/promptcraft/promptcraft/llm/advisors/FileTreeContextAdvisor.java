@@ -8,9 +8,14 @@ import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.StreamAdvisor;
 import org.springframework.ai.chat.client.advisor.api.StreamAdvisorChain;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,17 +31,39 @@ public class FileTreeContextAdvisor implements StreamAdvisor {
         Map<String, Object> context = chatClientRequest.context();
         Long projectId = Long.parseLong(context.getOrDefault("projectId", 0).toString());
 
-        ChatClientRequest augmentedChatClientRequest = augmentedRequestWithFiletree(chatClientRequest, projectId);
+        ChatClientRequest augmentedChatClientRequest = augmentRequestWithFiletree(chatClientRequest, projectId);
 
         return streamAdvisorChain.nextStream(augmentedChatClientRequest);
     }
 
-    private ChatClientRequest augmentedRequestWithFiletree(ChatClientRequest request, Long projectId){
+    private ChatClientRequest augmentRequestWithFiletree(ChatClientRequest request, Long projectId){
+
+        List<Message> incomingMessages = request.prompt().getInstructions();
+
+        Message systemMessage = incomingMessages.stream()
+                .filter(m -> m.getMessageType() == MessageType.SYSTEM)
+                .findFirst()
+                .orElse(null);
+
+        List<Message> userMessages = incomingMessages.stream()
+                .filter(m -> m.getMessageType() != MessageType.SYSTEM)
+                .toList();
+
+        List<Message> allMessages = new ArrayList<>();
+
+        if(systemMessage != null){
+            allMessages.add(systemMessage);
+        }
 
         List<FileNode> fileTree =  fileService.getFileTree(projectId);
         String fileTreeContext = "\n\n ----- FILE TREE ------\n\n" + fileTree.toString();
+        allMessages.add(new SystemMessage(fileTreeContext));
 
-        return null;
+        allMessages.addAll(userMessages);
+
+        return request.mutate()
+                .prompt(new Prompt(allMessages, request.prompt().getOptions()))
+                .build();
     }
 
     @Override
