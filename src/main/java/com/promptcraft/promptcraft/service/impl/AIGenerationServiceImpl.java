@@ -23,6 +23,7 @@ import reactor.core.scheduler.Schedulers;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,9 +58,11 @@ public class AIGenerationServiceImpl implements AIGenerationService {
         );
 
         StringBuilder fullResponseBuffer = new StringBuilder();
-
         CodeGenerationTools codeGenerationTools = new CodeGenerationTools(fileService, projectId);
 
+        AtomicReference<Long> startTime = new AtomicReference<>(System.currentTimeMillis());
+//        AtomicReference<Long> endTime = new AtomicReference<>(8L);
+        AtomicReference<Long> endTime = new AtomicReference<>(0L);
         return chatClient.prompt()
                 .system(Prompt.CODE_GENERATOR_SYSTEM_PROMPT + "---file_tree---" + fileService.getFileTree(projectId).toString())
                 .user(message)
@@ -73,12 +76,18 @@ public class AIGenerationServiceImpl implements AIGenerationService {
                 .chatResponse()
                 .doOnNext(response -> {
                     String content = response.getResult().getOutput().getText();
+
+                    if(content != null && !content.isEmpty() && endTime.get() == 0){
+                        endTime.set(System.currentTimeMillis());
+                    }
+
                     fullResponseBuffer.append(content);
                 })
                 .doOnComplete(() -> {
                     Schedulers.boundedElastic().schedule(() -> {
 //                        parseAndSaveFiles(fullResponseBuffer.toString(), projectId);
-                        finalizeChats(message, chatSession, fullResponseBuffer.toString(), projectId);
+                        long duration = (endTime.get() - startTime.get())/1000;
+                        finalizeChats(message, chatSession, fullResponseBuffer.toString(), projectId, duration);
                     });
                 })
                 .doOnError( error -> {
@@ -87,7 +96,7 @@ public class AIGenerationServiceImpl implements AIGenerationService {
                 .map(response -> Objects.requireNonNull(response.getResult().getOutput().getText()));
     }
 
-    private void finalizeChats(String userMessage, ChatSession chatSession, String fullText, Long projectId) {
+    private void finalizeChats(String userMessage, ChatSession chatSession, String fullText, Long projectId, Long duration) {
 
         chatMessageRepository.save(
                 ChatMessage.builder()
@@ -99,10 +108,19 @@ public class AIGenerationServiceImpl implements AIGenerationService {
 
         ChatMessage assistantChatMessage = ChatMessage.builder()
                 .role(MessageRole.ASSISTANT)
+                .content("Assistant Message here . . .")
                 .chatSession(chatSession)
                 .build();
 
+        assistantChatMessage = chatMessageRepository.save(assistantChatMessage);
+
         List<ChatEvent> chatEventList = llmResponseParser.parseChatEvents(fullText, assistantChatMessage);
+        chatEventList.addFirst(ChatEvent.builder()
+                        .chatEventType(ChatEventType.THOUGHT)
+                        .chatMessage(assistantChatMessage)
+                        .content("Thought for " + duration + "s")
+                        .sequenceOrder(0)
+                .build());
 
         chatEventList.stream()
                 .filter(e -> e.getChatEventType() == ChatEventType.FILE_EDIT)

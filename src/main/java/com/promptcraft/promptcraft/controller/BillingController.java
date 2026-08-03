@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -37,7 +38,8 @@ public class BillingController {
     private String webhookSecret;
 
     @GetMapping("/api/plans")
-    public ResponseEntity<PlanResponse> getAllPlans() {
+//    public ResponseEntity<PlanResponse> getAllPlans() {
+    public ResponseEntity<List<PlanResponse>> getAllPlans() {
 //        Long userId = 1L;
         return ResponseEntity.ok(planService.getAllActivePlans());
     }

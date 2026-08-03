@@ -4,6 +4,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# lecturer reference code
+reference/
+
 ### STS ###
 .apt_generated
 .classpath

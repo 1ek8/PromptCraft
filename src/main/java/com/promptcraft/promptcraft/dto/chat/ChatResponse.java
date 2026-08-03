@@ -1,7 +1,5 @@
 package com.promptcraft.promptcraft.dto.chat;
 
-import com.promptcraft.promptcraft.entity.ChatEvent;
-import com.promptcraft.promptcraft.entity.ChatSession;
 import com.promptcraft.promptcraft.entity.enums.MessageRole;
 
 import java.time.Instant;
@@ -11,11 +9,12 @@ public record ChatResponse(
 
         Long id,
 
-        ChatSession chatSession,
+//        ChatSession chatSession,
 
         MessageRole role,
 
-        List<ChatEvent> events,
+//        List<ChatEvent> events,
+        List<ChatEventResponse> events,
 
         String content,
 

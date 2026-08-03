@@ -18,9 +18,11 @@ import java.time.Instant;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChatSession {
 
-    @Id
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "id_id", nullable = false)
+//    @Id
+//    @ManyToOne(optional = false)
+//    @JoinColumn(name = "id_id", nullable = false)
+//    private ChatSessionId id;
+    @EmbeddedId
     private ChatSessionId id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
