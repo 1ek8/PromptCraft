@@ -2,12 +2,14 @@ package com.promptcraft.promptcraft.controller;
 
 import com.promptcraft.promptcraft.dto.file.FileContentResponse;
 import com.promptcraft.promptcraft.dto.file.FileNode;
+import com.promptcraft.promptcraft.dto.file.FileTreeResponse;
 import com.promptcraft.promptcraft.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -20,14 +22,17 @@ public class FileController {
     private final FileService fileService;
 
     @GetMapping
-    public ResponseEntity<List<FileNode>> getFileTree(@PathVariable Long projectId) {
+//    public ResponseEntity<List<FileNode>> getFileTree(@PathVariable Long projectId) {
+    public ResponseEntity<FileTreeResponse> getFileTree(@PathVariable Long projectId) {
         return ResponseEntity.ok(fileService.getFileTree(projectId));
     }
 
-    @GetMapping("/{*path}")
+//    @GetMapping("/{*path}")
+    @GetMapping("/content")
     public ResponseEntity<FileContentResponse> getFile(
             @PathVariable Long projectId,
-            @PathVariable String path
+//            @PathVariable String path
+            @RequestParam String path
     ) {
         Long userId = 1L;
         return ResponseEntity.ok(fileService.getFileContent(projectId, path));

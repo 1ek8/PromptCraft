@@ -3,6 +3,7 @@ package com.promptcraft.promptcraft.service.impl;
 import com.promptcraft.promptcraft.advice.exceptions.ResourceNotFoundException;
 import com.promptcraft.promptcraft.dto.file.FileContentResponse;
 import com.promptcraft.promptcraft.dto.file.FileNode;
+import com.promptcraft.promptcraft.dto.file.FileTreeResponse;
 import com.promptcraft.promptcraft.entity.Project;
 import com.promptcraft.promptcraft.entity.ProjectFile;
 import com.promptcraft.promptcraft.mapper.ProjectFileMapper;
@@ -41,10 +42,12 @@ public class FileServiceImpl implements FileService {
     private String projectBucket;
 
     @Override
-    public List<FileNode> getFileTree(Long projectId) {
+//    public List<FileNode> getFileTree(Long projectId) {
+    public FileTreeResponse getFileTree(Long projectId) {
 
         List<ProjectFile> projectFileList = fileRepository.findByProjectId(projectId);
-        return projectFileMapper.toListOfFileNode(projectFileList);
+//        return projectFileMapper.toListOfFileNode(projectFileList);
+        return new FileTreeResponse(projectFileMapper.toListOfFileNode(projectFileList));
 
     }
 

@@ -2,6 +2,7 @@ package com.promptcraft.promptcraft.controller;
 
 import com.promptcraft.promptcraft.dto.chat.ChatRequest;
 import com.promptcraft.promptcraft.dto.chat.ChatResponse;
+import com.promptcraft.promptcraft.dto.chat.StreamResponse;
 import com.promptcraft.promptcraft.service.AIGenerationService;
 import com.promptcraft.promptcraft.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,13 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping(value = "/api/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<String>> streamChat(
+//    public Flux<ServerSentEvent<String>> streamChat(
+    public Flux<ServerSentEvent<StreamResponse>> streamChat(
             @RequestBody ChatRequest request
     ) {
         return aiGenerationService.streamResponse(request.message(), request.projectId())
-                .map(data -> ServerSentEvent.<String>builder()
+//                .map(data -> ServerSentEvent.<String>builder()
+                .map(data -> ServerSentEvent.<StreamResponse>builder()
                         .data(data)
                         .build());
     }

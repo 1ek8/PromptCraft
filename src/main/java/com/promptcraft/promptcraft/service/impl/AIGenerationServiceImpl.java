@@ -1,6 +1,7 @@
 package com.promptcraft.promptcraft.service.impl;
 
 import com.promptcraft.promptcraft.advice.exceptions.ResourceNotFoundException;
+import com.promptcraft.promptcraft.dto.chat.StreamResponse;
 import com.promptcraft.promptcraft.entity.*;
 import com.promptcraft.promptcraft.entity.enums.ChatEventType;
 import com.promptcraft.promptcraft.entity.enums.MessageRole;
@@ -47,7 +48,8 @@ public class AIGenerationServiceImpl implements AIGenerationService {
 
     @Override
     @PreAuthorize("@security.canEditProject(#projectId)")
-    public Flux<String> streamResponse(String message, Long projectId) {
+//    public Flux<String> streamResponse(String message, Long projectId) {
+    public Flux<StreamResponse> streamResponse(String message, Long projectId) {
 
         Long userId = authUtil.getCurrentUserId();
         ChatSession chatSession = createChatSessionIfNotExists(projectId, userId);
@@ -93,7 +95,11 @@ public class AIGenerationServiceImpl implements AIGenerationService {
                 .doOnError( error -> {
                     log.error("Error during streaming for projectId: {}", projectId);
                 })
-                .map(response -> Objects.requireNonNull(response.getResult().getOutput().getText()));
+//                .map(response -> Objects.requireNonNull(response.getResult().getOutput().getText()));
+                .map(response -> {
+                    String text = response.getResult().getOutput().getText();
+                    return new StreamResponse(text != null ? text : "");
+                });
     }
 
     private void finalizeChats(String userMessage, ChatSession chatSession, String fullText, Long projectId, Long duration) {

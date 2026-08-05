@@ -9,7 +9,8 @@ public record ChatEventResponse(
 
 //        ChatMessage chatMessage,
 
-        ChatEventType chatEventType,
+//        ChatEventType chatEventType,
+        ChatEventType type,
 
         Integer sequenceOrder,
 
