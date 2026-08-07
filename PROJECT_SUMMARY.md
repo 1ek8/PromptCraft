@@ -516,18 +516,64 @@ minio:
 ## Building & Running
 
 ```bash
-# Prerequisites: Java 21, Maven, PostgreSQL (port 5434), MinIO
-
-# Build
-./mvnw clean compile
-
-# Run
-./mvnw spring-boot:run
-
-# Tests
-./mvnw test
-
-# OpenAPI docs (when running)
-# http://localhost:8080/swagger-ui.html
-# http://localhost:8080/v3/api-docs
+# Prerequisites: Java 21, Node.js (18+), Docker
 ```
+
+### 1. Start infrastructure (PostgreSQL + MinIO)
+
+```bash
+docker compose up -d
+# PostgreSQL  -> localhost:9010 (db: pgvector-test, user/password: user/password)
+# MinIO API   -> localhost:9000
+# MinIO Admin -> http://localhost:9001 (minioadmin / minioadmin123)
+```
+
+### 2. Prepare MinIO (one-time)
+
+The app does NOT auto-create buckets — project files are copied from a template
+into the project's bucket, so both must exist:
+
+1. Open http://localhost:9001 and log in with `minioadmin` / `minioadmin123`.
+2. Create two buckets: `starter` and `projects` (matches `minio.project-bucket` in `application.yaml`).
+3. Upload a Vite/React scaffold into `starter` under the prefix
+   `react-vite-tailwind-daisyui-starter/` (hardcoded in `ProjectTemplateServiceImpl`).
+   On project creation these files are copied to `projects/{projectId}/...`.
+   Without this template, project creation fails and the file tree stays empty.
+
+### 3. Configure env vars
+
+```bash
+export OPENROUTER_API_KEY=sk-or-v1-...   # required for AI chat (spring.ai.openai.api-key)
+export STRIPE_TEST_SECRET_KEY=sk_test_... # only needed for Stripe checkout
+```
+
+### 4. Run the backend
+
+```bash
+./mvnw spring-boot:run
+# API: http://localhost:8080  (swagger: /swagger-ui.html, /v3/api-docs)
+```
+
+### 5. Run the frontend
+
+The course frontend (Vite + React + TS) lives in a separate repo and runs on its
+own dev server. It calls the backend directly at `http://localhost:8080`
+(hardcoded in `src/lib/api.ts`), so no Vite proxy is needed.
+
+```bash
+git clone https://github.com/Anuj-Kumar-Sharma/project-companion.git
+cd project-companion
+npm install
+npm run dev
+# Frontend: http://localhost:5173
+```
+
+### 6. Tests
+
+```bash
+export OPENROUTER_API_KEY=sk-or-v1-...   # required: the context-load test boots the full app, which needs a non-empty key
+./mvnw test
+```
+
+> Note: `client.url` in `application.yaml` is used for Stripe checkout redirects
+> and points at `http://localhost:5173/` (the frontend).

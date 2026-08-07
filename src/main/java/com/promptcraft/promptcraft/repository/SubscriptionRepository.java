@@ -12,7 +12,8 @@ import java.util.Set;
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
 
-    Optional<Subscription> findByUserIdAndStatus(Long userId, Set<SubscriptionStatus> statusSet);
+//    Optional<Subscription> findByUserIdAndStatus(Long userId, Set<SubscriptionStatus> statusSet);
+    Optional<Subscription> findByUserIdAndStatusIn(Long userId, Set<SubscriptionStatus> statusSet);
 
     boolean existsByStripeSubscriptionId(String subscriptionId);
 

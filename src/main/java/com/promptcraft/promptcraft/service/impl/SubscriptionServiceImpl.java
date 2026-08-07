@@ -37,7 +37,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public SubscriptionResponse getCurrentSusbscription() {
         Long userId = authUtil.getCurrentUserId();
-        var currentSubscription = subscriptionRepository.findByUserIdAndStatus(userId, Set.of(
+//        var currentSubscription = subscriptionRepository.findByUserIdAndStatus(userId, Set.of(
+        var currentSubscription = subscriptionRepository.findByUserIdAndStatusIn(userId, Set.of(
                 SubscriptionStatus.ACTIVE, SubscriptionStatus.PAST_DUE,
                 SubscriptionStatus.TRAILING
         )).orElse(

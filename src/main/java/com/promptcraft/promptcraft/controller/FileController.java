@@ -34,7 +34,6 @@ public class FileController {
 //            @PathVariable String path
             @RequestParam String path
     ) {
-        Long userId = 1L;
         return ResponseEntity.ok(fileService.getFileContent(projectId, path));
     }
 

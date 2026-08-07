@@ -45,7 +45,8 @@ stripe:
     secret: whsec_659523b32d50f5a69021628904449886b8188e01e2da64ac2ce0f2cd863a0aed
 
 client:
-  url: http://localhost:8080/
+#  url: http://localhost:8080/
+  url: http://localhost:5173/
 
 logging:
   level:

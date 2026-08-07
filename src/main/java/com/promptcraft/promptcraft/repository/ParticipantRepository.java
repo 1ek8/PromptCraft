@@ -23,9 +23,14 @@ public interface ParticipantRepository extends JpaRepository<ProjectParticipant,
             """)
     Optional<ProjectRole> findRoleByProjectIdAndUserId(@Param("projectId") Long projectId, @Param("userId")Long userId);
 
+//    @Query("""
+//            SELECT COUNT(pm) FROM ProjectParticipant pm
+//            WHERE pm.id.userId = :userId AND pm.projectRole = 'OWNER'
+//            """)
+//    int countProjectOwnedByUser(@Param("userId") Long userId);
     @Query("""
             SELECT COUNT(pm) FROM ProjectParticipant pm
-            WHERE pm.id.userId = :userId AND pm.projectRole = 'OWNER'
+            WHERE pm.id.userId = :userId AND pm.projectRole = com.promptcraft.promptcraft.entity.enums.ProjectRole.OWNER
             """)
     int countProjectOwnedByUser(@Param("userId") Long userId);
 }

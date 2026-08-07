@@ -51,17 +51,24 @@ public class ProjectServiceImpl implements ProjectService {
 //                .map(project -> projectMapper.toProjectSummaryResponse(project))
 //                .collect(Collectors.toList());
         Long userId = authUtil.getCurrentUserId();
-        return projectMapper.toListOfProjectSummaryRepsonse(projectRepository.findAllProjectsAccessibleByUser(userId));
+//        return projectMapper.toListOfProjectSummaryRepsonse(projectRepository.findAllProjectsAccessibleByUser(userId));
+        return projectRepository.findAllAccessibleByUser(userId).stream()
+                .map(p -> projectMapper.toProjectSummaryResponse(p.getProject(), p.getRole()))
+                .toList();
     }
 
     @Override
     @PreAuthorize("@security.canViewProject(#projectId)")
-    public ProjectResponse getProjectById(Long projectId) {
+//    public ProjectResponse getProjectById(Long projectId) {
+    public ProjectSummaryResponse getProjectById(Long projectId) {
         Long userId = authUtil.getCurrentUserId();
-        Project project = projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow(
-                () -> new ResourceNotFoundException("Project", projectId.toString())
-        );
-        return projectMapper.toProjectResponse(project);
+//        Project project = projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow(
+//                () -> new ResourceNotFoundException("Project", projectId.toString())
+//        );
+//        return projectMapper.toProjectResponse(project);
+        var projectWithRole = projectRepository.findAccessibleProjectByIdWithRole(projectId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project", projectId.toString()));
+        return projectMapper.toProjectSummaryResponse(projectWithRole.getProject(), projectWithRole.getRole());
     }
 
     @Override
