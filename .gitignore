@@ -35,6 +35,10 @@ build/
 ### VS Code ###
 .vscode/
 
+# Postman local state
+postman/
+.postman/
+
 #AI tools
 .repomixignore
 repomix-output.xml
