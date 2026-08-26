@@ -126,12 +126,20 @@ public class AIGenerationServiceImpl implements AIGenerationService {
             usageService.recordTokenUsage(userId, totalTokens);
         }
 
+        // usage metadata can be absent on some streams (e.g. provider error); fall back to 0 instead of NPE
+        int promptTokens = usage != null ? usage.getPromptTokens() : 0;
+        int completionTokens = usage != null ? usage.getCompletionTokens() : 0;
+        if(usage == null) {
+            log.warn("No usage metadata received in stream; recording 0 tokens for projectId {}", projectId);
+        }
+
         chatMessageRepository.save(
                 ChatMessage.builder()
                         .chatSession(chatSession)
                         .role(MessageRole.USER)
                         .content(userMessage)
-                        .tokensUsed(usage.getPromptTokens())
+//                        .tokensUsed(usage.getPromptTokens())
+                        .tokensUsed(promptTokens)
                         .build()
         );
 
@@ -139,7 +147,8 @@ public class AIGenerationServiceImpl implements AIGenerationService {
                 .role(MessageRole.ASSISTANT)
                 .content("Assistant Message here . . .")
                 .chatSession(chatSession)
-                .tokensUsed(usage.getCompletionTokens())
+//                .tokensUsed(usage.getCompletionTokens())
+                .tokensUsed(completionTokens)
                 .build();
 
         assistantChatMessage = chatMessageRepository.save(assistantChatMessage);
