@@ -30,8 +30,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.awt.SystemColor.text;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -47,7 +45,7 @@ public class AIGenerationServiceImpl implements AIGenerationService {
     private final UserRepository userRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatEventRepository chatEventRepository;
-    private final UsageLogRepository usageLogRepository;
+//    private final UsageLogRepository usageLogRepository;
     private final UsageService usageService;
 
     private static final Pattern FILE_TAG_PATTERN = Pattern.compile("<file path=\"([^\"]+)\">(.*?)</file>", Pattern.DOTALL);
@@ -113,8 +111,7 @@ public class AIGenerationServiceImpl implements AIGenerationService {
                 .map(response -> {
                     String text = response.getResult().getOutput().getText();
                     return new StreamResponse(text != null ? text : "");
-                    }
-                );
+                });
     }
 
     private void finalizeChats(String userMessage, ChatSession chatSession, String fullText, Long duration, Usage usage, Long userId) {
