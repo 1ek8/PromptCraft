@@ -79,10 +79,29 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
 
         //could check for each of the below fields too like i did above, but didn't
-        subscription.setCurrentPeriodStart(periodStart);
-        subscription.setCurrentPeriodEnd(periodEnd);
-        subscription.setCanceledAtPeriodEnd(cancelAtPeriodEnd);
-        subscription.setPlan(getPlan(planId));
+//        subscription.setCurrentPeriodStart(periodStart);
+//        subscription.setCurrentPeriodEnd(periodEnd);
+//        subscription.setCanceledAtPeriodEnd(cancelAtPeriodEnd);
+//        subscription.setPlan(getPlan(planId));
+        if(periodStart != null && !periodStart.equals(subscription.getCurrentPeriodStart())) {
+            subscription.setCurrentPeriodStart(periodStart);
+            hasSubscriptionBeenUpdated = true;
+        }
+        if(periodEnd != null && !periodEnd.equals(subscription.getCurrentPeriodEnd())) {
+            subscription.setCurrentPeriodEnd(periodEnd);
+            hasSubscriptionBeenUpdated = true;
+        }
+        if(cancelAtPeriodEnd != null && cancelAtPeriodEnd != subscription.getCanceledAtPeriodEnd()) {
+            subscription.setCanceledAtPeriodEnd(cancelAtPeriodEnd);
+            hasSubscriptionBeenUpdated = true;
+        }
+        if(planId != null) {
+            Plan newPlan = getPlan(planId);
+            if(!newPlan.equals(subscription.getPlan())) {
+                subscription.setPlan(newPlan);
+                hasSubscriptionBeenUpdated = true;
+            }
+        }
 
         if(hasSubscriptionBeenUpdated){
             log.debug("Subscription has been updated: {}", subId);
@@ -109,6 +128,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             subscription.setStatus(SubscriptionStatus.ACTIVE);
         }
 
+        subscriptionRepository.save(subscription);
     }
 
     @Override
