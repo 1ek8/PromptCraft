@@ -115,14 +115,13 @@ public class FileServiceImpl implements FileService {
     }
 
     private String determineContentType(String path) {
-        String type = URLConnection.guessContentTypeFromName(path);
-
-        if(type == null) return type;
         if (path.endsWith(".jsx") || path.endsWith(".ts") || path.endsWith(".tsx")) return "text/javascript";
         if (path.endsWith(".json")) return "application/json";
         if (path.endsWith(".css")) return "text/css";
+        if (path.endsWith(".html")) return "text/html";
 
-        return "text/plain";
+        String type = URLConnection.guessContentTypeFromName(path);
+        return type != null ? type : "text/plain";
     }
 
 }

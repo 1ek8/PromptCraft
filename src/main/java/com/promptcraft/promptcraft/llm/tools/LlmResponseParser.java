@@ -61,7 +61,6 @@ public class LlmResponseParser {
                 case "file" -> {
                     builder.chatEventType(ChatEventType.FILE_EDIT);
                     builder.filePath(attrMap.get("path"));
-                    builder.content(null);
                 }
                 case "tool" -> {
                     builder.chatEventType(ChatEventType.TOOL_LOG);
