@@ -94,6 +94,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         ProjectParticipantId participantId = new ProjectParticipantId(project.getId(), owner.getId());
         ProjectParticipant participant = ProjectParticipant.builder()
+                .Id(participantId)
                 .projectRole(ProjectRole.OWNER)
                 .user(owner)
                 .acceptedAt(Instant.now())
