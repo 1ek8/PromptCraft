@@ -6,7 +6,7 @@ import com.promptcraft.promptcraft.repository.ParticipantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("security")
 @RequiredArgsConstructor
 public class SecurityExpressions {
 

@@ -1,7 +1,6 @@
 package com.promptcraft.promptcraft.service.impl;
 
 import com.promptcraft.promptcraft.dto.chat.ChatResponse;
-import com.promptcraft.promptcraft.entity.ChatMessage;
 import com.promptcraft.promptcraft.entity.ChatSession;
 import com.promptcraft.promptcraft.entity.ChatSessionId;
 import com.promptcraft.promptcraft.mapper.ChatMapper;
@@ -32,12 +31,9 @@ public class ChatServiceImpl implements ChatService {
     public List<ChatResponse> getProjectChatHistory(Long projectId) {
         Long userId = authUtil.getCurrentUserId();
 
-        ChatSession chatSession = chatSessionRepository.getReferenceById(
-                new ChatSessionId(projectId, userId)
-        );
-
-        List<ChatMessage> chatMessageList =  chatMessageRepository.findByChatSession(chatSession);
-
-        return chatMapper.fromListOfChatMessage(chatMessageList);
+        return chatSessionRepository.findById(new ChatSessionId(projectId, userId))
+                .map(chatSession -> chatMapper.fromListOfChatMessage(
+                        chatMessageRepository.findByChatSession(chatSession)))
+                .orElseGet(List::of);
     }
 }
