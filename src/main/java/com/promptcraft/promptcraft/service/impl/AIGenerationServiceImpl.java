@@ -11,6 +11,7 @@ import com.promptcraft.promptcraft.llm.tools.CodeGenerationTools;
 import com.promptcraft.promptcraft.llm.tools.LlmResponseParser;
 import com.promptcraft.promptcraft.repository.*;
 import com.promptcraft.promptcraft.security.AuthUtil;
+import com.promptcraft.promptcraft.security.SecurityExpressions;
 import com.promptcraft.promptcraft.service.AIGenerationService;
 import com.promptcraft.promptcraft.service.FileService;
 import com.promptcraft.promptcraft.service.UsageService;
@@ -18,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.metadata.Usage;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -47,13 +47,19 @@ public class AIGenerationServiceImpl implements AIGenerationService {
     private final ChatEventRepository chatEventRepository;
 //    private final UsageLogRepository usageLogRepository;
     private final UsageService usageService;
+    private final SecurityExpressions securityExpressions;
 
     private static final Pattern FILE_TAG_PATTERN = Pattern.compile("<file path=\"([^\"]+)\">(.*?)</file>", Pattern.DOTALL);
 
     @Override
-    @PreAuthorize("@security.canEditProject(#projectId)")
 //    public Flux<String> streamResponse(String message, Long projectId) {
     public Flux<StreamResponse> streamResponse(String message, Long projectId) {
+
+        // Authorization is enforced eagerly on the request thread (SecurityContext present).
+        // Using @PreAuthorize on a Flux-returning method defers the check to the background
+        // subscription thread where the SecurityContext is absent, throwing an access-denied
+        // "response already committed" error that truncates the SSE stream.
+        securityExpressions.canEditProject(projectId);
 
         usageService.checkDailyTokensUsage();
 
