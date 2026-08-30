@@ -67,8 +67,8 @@ public class FileServiceImpl implements FileService {
             String content = new String(is.readAllBytes(), StandardCharsets.UTF_8);
             return new FileContentResponse(path, content);
         } catch (Exception e) {
-            log.error("Failed to read file: {}/{}", projectId, path, e);
-            throw new RuntimeException("Failed to read file content", e);
+            log.warn("Failed to read file: {}/{} (returning empty content): {}", projectId, path, e.getMessage());
+            return new FileContentResponse(path, "");
         }
 
     }

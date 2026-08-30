@@ -30,7 +30,7 @@
         @ExceptionHandler(BadRequestException.class)
         public ResponseEntity<ApiResponse> handleBadRequest(BadRequestException exception) {
             ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, exception.getMessage());
-            log.error(apiError.toString());
+            log.error(apiError.toString(), exception);
 
             return buildErrorResponseEntity(apiError);
         }
@@ -51,7 +51,7 @@
         @ExceptionHandler(Exception.class)
         public ResponseEntity<ApiResponse> handleInternalServerError(Exception exception) {
             ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
-            log.error(apiError.toString());
+            log.error(apiError.toString(), exception);
 
             return buildErrorResponseEntity(apiError);
         }
