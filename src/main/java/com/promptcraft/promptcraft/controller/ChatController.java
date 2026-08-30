@@ -8,10 +8,11 @@ import com.promptcraft.promptcraft.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -23,15 +24,34 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-//    public Flux<ServerSentEvent<String>> streamChat(
-    public Flux<ServerSentEvent<StreamResponse>> streamChat(
+    public SseEmitter streamChat(
             @RequestBody ChatRequest request
     ) {
-        return aiGenerationService.streamResponse(request.message(), request.projectId())
-//                .map(data -> ServerSentEvent.<String>builder()
-                .map(data -> ServerSentEvent.<StreamResponse>builder()
-                        .data(data)
-                        .build());
+        // Using SseEmitter (native Spring MVC async) instead of returning a raw reactive
+        // Flux. Returning a Flux from a Spring MVC controller routes it through
+        // ReactiveTypeHandler, whose async re-dispatch re-enters the Spring Security
+        // AuthorizationFilter on a thread without authentication. With the SSE response
+        // already committed that throws "Unable to handle the Spring Security Exception
+        // because the response is already committed" and truncates the stream
+        // (ERR_INCOMPLETE_CHUNKED_ENCODING). SseEmitter avoids that while keeping the
+        // same SSE wire format for the frontend.
+        SseEmitter emitter = new SseEmitter(0L);
+
+        Flux<StreamResponse> stream = aiGenerationService.streamResponse(request.message(), request.projectId());
+
+        stream.subscribe(
+                data -> {
+                    try {
+                        emitter.send(SseEmitter.event().data(data));
+                    } catch (IOException | IllegalStateException e) {
+                        emitter.completeWithError(e);
+                    }
+                },
+                emitter::completeWithError,
+                emitter::complete
+        );
+
+        return emitter;
     }
 
     @GetMapping("/projects/{projectId}")
