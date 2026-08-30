@@ -58,3 +58,7 @@ minio:
   access-key: minioadmin
   secret-key: minioadmin123
   project-bucket: projects
+
+app:
+  subscription:
+    free-tier-projects-allowed: 3

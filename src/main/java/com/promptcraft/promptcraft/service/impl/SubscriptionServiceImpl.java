@@ -16,6 +16,7 @@ import com.promptcraft.promptcraft.service.SubscriptionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -32,7 +33,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final UserRepository userRepository;
     private final PlanRepository planRepository;
     private final ParticipantRepository participantRepository;
-    private final Integer FREE_TIER_PROJECTS_ALLOWED = 1;
+
+    @Value("${app.subscription.free-tier-projects-allowed:3}")
+    private Integer freeTierProjectsAllowed;
 
     @Override
     public SubscriptionResponse getCurrentSusbscription() {
@@ -153,7 +156,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         int countOfOwnedProjects = participantRepository.countProjectOwnedByUser(userId);
 
         if(currentSubscription.plan() == null){
-            return countOfOwnedProjects < FREE_TIER_PROJECTS_ALLOWED;
+            return countOfOwnedProjects < freeTierProjectsAllowed;
         }
 
         return countOfOwnedProjects < currentSubscription.plan().maxProjects();
