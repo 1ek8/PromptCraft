@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.metadata.Usage;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -58,8 +59,13 @@ public class AIGenerationServiceImpl implements AIGenerationService {
         // Authorization is enforced eagerly on the request thread (SecurityContext present).
         // Using @PreAuthorize on a Flux-returning method defers the check to the background
         // subscription thread where the SecurityContext is absent, throwing an access-denied
-        // "response already committed" error that truncates the SSE stream.
-        securityExpressions.canEditProject(projectId);
+        // "response already committed" error that truncates the SSE stream. The endpoint is
+        // permitAll in the filter chain (the SseEmitter async completion re-dispatch must not
+        // re-run authorization), so this eager check is the actual authorization gate and must
+        // throw cleanly here, before any SSE bytes are written.
+        if (!securityExpressions.canEditProject(projectId)) {
+            throw new AccessDeniedException("You do not have permission to chat in this project");
+        }
 
         usageService.checkDailyTokensUsage();
 

@@ -29,7 +29,16 @@ public class WebSecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/webhooks/**").permitAll()
+                        // /api/chat/stream uses an SseEmitter, which Tomcat completes via an
+                        // async re-dispatch. That dispatch re-runs this filter chain on a thread
+                        // without a SecurityContext (SecurityContextHolderFilter clears it), so
+                        // .anyRequest().authenticated() would throw AuthorizationDeniedException
+                        // AFTER the SSE response is already committed, truncating the stream.
+                        // Authorization for this endpoint is enforced eagerly in
+                        // AIGenerationServiceImpl.streamResponse (which runs on the initial
+                        // request thread with a valid SecurityContext and throws
+                        // AccessDeniedException before any bytes are sent).
+                        .requestMatchers("/api/auth/**", "/webhooks/**", "/api/chat/stream").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

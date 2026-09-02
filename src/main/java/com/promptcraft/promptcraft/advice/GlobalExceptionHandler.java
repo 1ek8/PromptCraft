@@ -8,6 +8,7 @@
     import org.springframework.http.ResponseEntity;
     import org.springframework.security.core.Authentication;
     import org.springframework.security.core.AuthenticationException;
+    import org.springframework.security.access.AccessDeniedException;
     import org.springframework.security.core.userdetails.UsernameNotFoundException;
     import org.springframework.web.bind.MethodArgumentNotValidException;
     import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -73,6 +74,13 @@
         @ExceptionHandler(AuthenticationException.class)
         public ResponseEntity<ApiError> handleAuthenticatioException(AuthenticationException ex) {
             ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED, "Authentication failed: " + ex.getMessage());
+            log.error(apiError.toString(), ex);
+            return ResponseEntity.status(apiError.status()).body(apiError);
+        }
+
+        @ExceptionHandler(AccessDeniedException.class)
+        public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException ex) {
+            ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, ex.getMessage());
             log.error(apiError.toString(), ex);
             return ResponseEntity.status(apiError.status()).body(apiError);
         }
