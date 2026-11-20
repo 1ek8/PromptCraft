@@ -1,5 +1,7 @@
 package com.promptcraft.promptcraft.service.impl;
 
+import com.promptcraft.promptcraft.advice.exceptions.BadRequestException;
+import com.promptcraft.promptcraft.advice.exceptions.ResourceNotFoundException;
 import com.promptcraft.promptcraft.dto.participant.InviteParticipantRequest;
 import com.promptcraft.promptcraft.dto.participant.ParticipantResponse;
 import com.promptcraft.promptcraft.dto.participant.UpdateParticipantRole;
@@ -71,12 +73,13 @@ public class ParticipantServiceImpl implements ParticipantService {
 //        }
 //        this can be done using spring security itself while authenticating and authorizing
 
-        User invited = userRepository.findByUsername(request.username()).orElseThrow();
+        User invited = userRepository.findByUsername(request.username()).orElseThrow(() ->
+                new ResourceNotFoundException("User", request.username()));
 
         ProjectParticipantId projectParticipantId = new ProjectParticipantId(projectId, invited.getId());
 
         if(participantRepository.existsById(projectParticipantId)) {
-            throw new RuntimeException("User is already a participant in the project");
+            throw new BadRequestException("User is already a participant in the project");
         }
 
         ProjectParticipant participant = ProjectParticipant.builder()

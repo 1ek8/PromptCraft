@@ -35,18 +35,18 @@ public class ParticipantController {
     @PatchMapping("/{participantId}")
     public ResponseEntity<ParticipantResponse> updatePartipcpantRole(
             @PathVariable Long projectId,
-            @PathVariable Long particpantId,
+            @PathVariable Long participantId,
             @RequestBody @Valid UpdateParticipantRole request
     ){
-        return ResponseEntity.ok(participantService.updateParticipantRole(projectId, particpantId, request));
+        return ResponseEntity.ok(participantService.updateParticipantRole(projectId, participantId, request));
     }
 
     @DeleteMapping("/{participantId}")
     public ResponseEntity<Void> removeParticipant(
             @PathVariable Long projectId,
-            @PathVariable Long particpantId
+            @PathVariable Long participantId
     ){
-        participantService.removeParticipant(projectId, particpantId);
+        participantService.removeParticipant(projectId, participantId);
         return ResponseEntity.noContent().build();
     }
 

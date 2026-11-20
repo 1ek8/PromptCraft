@@ -6,6 +6,7 @@ import com.promptcraft.promptcraft.dto.file.FileTreeResponse;
 import com.promptcraft.promptcraft.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,12 +24,14 @@ public class FileController {
 
     @GetMapping
 //    public ResponseEntity<List<FileNode>> getFileTree(@PathVariable Long projectId) {
+    @PreAuthorize("@security.canViewProject(#projectId)")
     public ResponseEntity<FileTreeResponse> getFileTree(@PathVariable Long projectId) {
         return ResponseEntity.ok(fileService.getFileTree(projectId));
     }
 
 //    @GetMapping("/{*path}")
     @GetMapping("/content")
+    @PreAuthorize("@security.canViewProject(#projectId)")
     public ResponseEntity<FileContentResponse> getFile(
             @PathVariable Long projectId,
 //            @PathVariable String path
