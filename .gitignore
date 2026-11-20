@@ -48,3 +48,9 @@ src/main/resources/application.yaml
 # macOS
 .DS_Store
 **/.DS_Store
+
+# direnv (per-dir gcloud project)
+.envrc
+
+# local secrets (OPENROUTER_API_KEY, STRIPE_TEST_SECRET_KEY)
+.env

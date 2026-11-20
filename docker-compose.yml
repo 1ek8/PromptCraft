@@ -14,7 +14,9 @@ services:
     restart: unless-stopped
 
   minio:
-    image: quay.io/minio/minio:latest
+    # quay.io/minio/minio:latest now returns 401 (MinIO stopped public distribution).
+    # pgsty/minio is the community-maintained fork: same binary, CLI flags and env vars.
+    image: pgsty/minio:latest
     container_name: minio-promptcraft
     command: server /data --console-address ":9001"
     environment:
