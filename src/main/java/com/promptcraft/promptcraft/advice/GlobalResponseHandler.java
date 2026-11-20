@@ -3,6 +3,8 @@ package com.promptcraft.promptcraft.advice;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,7 +17,12 @@ public class GlobalResponseHandler implements ResponseBodyAdvice {
 
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
-        return true;
+        // Raw String/byte responses must not be wrapped: the StringHttpMessageConverter
+        // expects a String and fails with a ClassCastException if it receives an
+        // ApiResponse. This affects endpoints that answer with a plain body, such as the
+        // Stripe webhook acknowledgement.
+        return !StringHttpMessageConverter.class.isAssignableFrom(converterType)
+                && !ByteArrayHttpMessageConverter.class.isAssignableFrom(converterType);
     }
 
     @Override
@@ -26,7 +33,7 @@ public class GlobalResponseHandler implements ResponseBodyAdvice {
                 .stream()
                 .anyMatch(route -> request.getURI().getPath().contains(route));
 
-        if(body instanceof ApiResponse<?> || isAllowed) {
+        if(body == null || body instanceof ApiResponse<?> || isAllowed) {
             return body;
         }
 

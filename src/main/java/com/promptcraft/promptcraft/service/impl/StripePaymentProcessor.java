@@ -59,7 +59,12 @@ public class StripePaymentProcessor implements PaymentProcessor {
 
             String stripeCustomerId = user.getStripeCustomerId();
             if(stripeCustomerId == null || stripeCustomerId.isEmpty()) {
-                params.setCustomerEmail(user.getUsername());
+                // Stripe rejects a checkout session when customer_email is not a valid
+                // address. Usernames are not guaranteed to be emails, so only send one
+                // when it actually looks like an email; otherwise let Stripe collect it.
+                if (isEmailAddress(user.getUsername())) {
+                    params.setCustomerEmail(user.getUsername());
+                }
             } else {
                 params.setCustomer(stripeCustomerId);
             }
@@ -69,6 +74,10 @@ public class StripePaymentProcessor implements PaymentProcessor {
         } catch (StripeException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean isEmailAddress(String value) {
+        return value != null && value.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
     }
 
     @Override

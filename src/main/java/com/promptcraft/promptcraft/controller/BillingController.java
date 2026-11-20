@@ -99,7 +99,8 @@ public class BillingController {
             return ResponseEntity.ok().build();
 
         } catch (SignatureVerificationException e) {
-            throw new RuntimeException(e);
+            log.warn("Rejected Stripe webhook with invalid signature: {}", e.getMessage());
+            return ResponseEntity.badRequest().body("Invalid signature");
         }
 
     }
