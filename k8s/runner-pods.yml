@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: runner-pool
+  namespace: promptcraft-apps
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: runner
+      status: idle #will be changed to running when not idle
+  template:
+    metadata:
+      labels:
+        app: runner
+        status: idle
+    spec:
+      volumes:
+        - name: workspace
+          emptyDir: {}
+        - name: pnpm-store
+          hostPath:
+            path: /mnt/pnpm-store
+            type: DirectoryOrCreate
+      containers:
+        - name: runner
+          image: node:20-alpine
+          workingDir: /app
+          command: ["/bin/sh", "-c", "sleep infinity"]
+          volumeMounts:
+            - name: workspace
+              mountPath: /app
+            - name: pnpm-store
+              mountPath: /root/.local/share/pnpm
+          ports:
+            - containerPort: 5173
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              # npm install can peak over 1Gi; 512Mi is enough to start the container.
+              # "101" (bare number) means 101 BYTES and OOM-kills the container at init.
+              memory: "512Mi"
+
+        - name: syncer
+          image: pgsty/mc:latest
+          command: ["/bin/sh", "-c", "sleep infinity"]
+          env:
+            - name: MC_HOST_myminio
+              value: "http://$(MINIO_USER):$(MINIO_PASS)@minio-service:9000"
+          envFrom:
+            - secretRef:
+                name: minio-creds
+          volumeMounts:
+            - name: workspace
+              mountPath: /app

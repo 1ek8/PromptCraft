@@ -1,9 +1,11 @@
 package com.promptcraft.promptcraft.controller;
 
+import com.promptcraft.promptcraft.dto.deploy.DeployResponse;
 import com.promptcraft.promptcraft.dto.project.ProjectRequest;
 import com.promptcraft.promptcraft.dto.project.ProjectResponse;
 import com.promptcraft.promptcraft.dto.project.ProjectSummaryResponse;
 import com.promptcraft.promptcraft.security.AuthUtil;
+import com.promptcraft.promptcraft.service.DeploymentService;
 import com.promptcraft.promptcraft.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final DeploymentService deploymentService;
     private final AuthUtil authUtil;
 
     @GetMapping()
@@ -52,6 +55,11 @@ public class ProjectController {
 //        Long userId = 1L;
         projectService.softDelete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/deploy")
+    public ResponseEntity<DeployResponse> deployProject(@PathVariable Long id) {
+        return ResponseEntity.ok(deploymentService.deploy(id));
     }
 
 }
