@@ -54,3 +54,6 @@ src/main/resources/application.yaml
 
 # local secrets (OPENROUTER_API_KEY, STRIPE_TEST_SECRET_KEY)
 .env
+
+# proxy dependencies
+proxy/node_modules/

@@ -1,0 +1,13 @@
+{
+    "name": "promptcraft-proxy",
+    "version": "1.0.0",
+    "description": "Wildcard proxy for project previews",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index"
+    },
+    "dependencies": {
+        "http-proxy": "^1.18.1",
+        "ioredis": "^6.0.0"
+    }
+}
