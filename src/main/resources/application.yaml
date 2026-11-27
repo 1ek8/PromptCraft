@@ -30,6 +30,13 @@ spring:
           model: deepseek/deepseek-v4-flash
           temperature: 0.0
 
+  # Redis is used as the preview routing table: the deploy service writes
+  # route:<host> -> <podIp>:5173 and the proxy reads it.
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
 #ai:
 #  openai:
 #    api-key: https://openrouter.ai/api

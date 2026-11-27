@@ -8,10 +8,12 @@ import io.fabric8.kubernetes.client.dsl.ExecListener;
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -22,6 +24,7 @@ import java.util.concurrent.TimeoutException;
 public class DeploymentServiceImpl implements DeploymentService {
 
     private final KubernetesClient kubernetesClient;
+    private final StringRedisTemplate redisTemplate;
 
     private static final String NAMESPACE = "promptcraft-apps";
     private static final String POOL_LABEL = "status";
@@ -39,6 +42,9 @@ public class DeploymentServiceImpl implements DeploymentService {
     private static final long SHORT_TIMEOUT_SECONDS = 30;
     private static final long DEV_SERVER_READY_TIMEOUT_SECONDS = 90;
 
+    /** Safety net: a preview route disappears on its own if nobody refreshes it. */
+    private static final Duration ROUTE_TTL = Duration.ofHours(6);
+
     @Override
     public DeployResponse deploy(Long projectId) {
 
@@ -47,6 +53,8 @@ public class DeploymentServiceImpl implements DeploymentService {
         Pod existingPod = findActivePod(projectId);
 
         if(existingPod != null) {
+            // The pod may have restarted or the route may have expired; refresh it.
+            registerRoute(domain, existingPod.getMetadata().getName());
             return new DeployResponse("http://" + domain + ":" + REVERSE_PROXY_PORT);
         }
 
@@ -99,8 +107,34 @@ public class DeploymentServiceImpl implements DeploymentService {
         // 5. Wait until it actually answers before handing the URL back.
         waitForDevServer(podName, projectId);
 
+        // 6. Publish the route the proxy needs: Host header -> pod IP:5173.
+        registerRoute(domain, podName);
+
         log.info("Deployment successful: http://{}:{}", domain, REVERSE_PROXY_PORT);
         return new DeployResponse("http://" + domain + ":" + REVERSE_PROXY_PORT);
+    }
+
+    /**
+     * Writes the preview routing entry the proxy reads: route:<host> -> <podIp>:5173.
+     * A TTL is used as a safety net so stale routes disappear if the pod dies.
+     */
+    private void registerRoute(String domain, String podName) {
+
+        Pod pod = kubernetesClient.pods().inNamespace(NAMESPACE).withName(podName).get();
+        String podIp = (pod != null && pod.getStatus() != null) ? pod.getStatus().getPodIP() : null;
+
+        if (podIp == null) {
+            log.warn("Pod {} has no IP yet, preview route for {} was not registered", podName, domain);
+            return;
+        }
+
+        try {
+            redisTemplate.opsForValue().set("route:" + domain, podIp + ":5173", ROUTE_TTL);
+            log.info("Registered preview route {} -> {}:5173", domain, podIp);
+        } catch (Exception e) {
+            // The deploy itself succeeded, so do not fail the request; log loudly instead.
+            log.error("Could not register preview route for {}: {}", domain, e.getMessage());
+        }
     }
 
     private void waitForDevServer(String podName, Long projectId) {
