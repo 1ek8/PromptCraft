@@ -97,17 +97,21 @@ public class AIGenerationServiceImpl implements AIGenerationService {
                 .stream()
                 .chatResponse()
                 .doOnNext(response -> {
-                    String content = response.getResult().getOutput().getText();
+                    // The final chunk of a stream with usage enabled carries no choices,
+                    // only token usage. Calling getResult() on it throws, so guard it.
+                    if (response.getResults() != null && !response.getResults().isEmpty()) {
+                        String content = response.getResult().getOutput().getText();
 
-                    if(content != null && !content.isEmpty() && endTime.get() == 0){
-                        endTime.set(System.currentTimeMillis());
+                        if(content != null && !content.isEmpty() && endTime.get() == 0){
+                            endTime.set(System.currentTimeMillis());
+                        }
+
+                        if(response.getMetadata().getUsage() != null){
+                            usageRef.set(response.getMetadata().getUsage() );
+                        }
+
+                        fullResponseBuffer.append(content);
                     }
-
-                    if(response.getMetadata().getUsage() != null){
-                        usageRef.set(response.getMetadata().getUsage() );
-                    }
-
-                    fullResponseBuffer.append(content);
                 })
                 .doOnComplete(() -> {
                     Schedulers.boundedElastic().schedule(() -> {
@@ -121,6 +125,9 @@ public class AIGenerationServiceImpl implements AIGenerationService {
                 })
 //                .map(response -> Objects.requireNonNull(response.getResult().getOutput().getText()));
                 .map(response -> {
+                    if (response.getResults() == null || response.getResults().isEmpty()) {
+                        return new StreamResponse("");
+                    }
                     String text = response.getResult().getOutput().getText();
                     return new StreamResponse(text != null ? text : "");
                 });
