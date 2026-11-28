@@ -1,7 +1,7 @@
 package com.promptcraft.promptcraft.dto.subscription;
 
 public record PlanResponse(
-        Long Id,
+        Long id,
 
         String name,
 
